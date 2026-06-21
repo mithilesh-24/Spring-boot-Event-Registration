@@ -1,3 +1,9 @@
 spring:
   application:
     name: EventManagement
+  datasource:
+    username: root
+    password: 123456
+
+server:
+  port: 8090
