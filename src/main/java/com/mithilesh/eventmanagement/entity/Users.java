@@ -20,19 +20,19 @@ public class Users {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    long user_id;
+    private long user_id;
 
-    String first_name;
-    String last_name;
-    LocalDate dob;
-
-    @Enumerated(EnumType.STRING)
-    Gender gender;
-    String email;
-    String Password;
+    private String first_name;
+    private String last_name;
+    private LocalDate dob;
 
     @Enumerated(EnumType.STRING)
-    Role role = Role.USER;
+    private Gender gender;
+    private String email;
+    private String Password;
+
+    @Enumerated(EnumType.STRING)
+    private Role role = Role.USER;
 
     @ManyToMany
     @JoinTable(
@@ -40,7 +40,7 @@ public class Users {
             joinColumns =  @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "event_id")
     )
-    List<Events> reg_event;
+    private List<Events> reg_event;
 
     @ManyToMany
     @JoinTable(
@@ -48,5 +48,5 @@ public class Users {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "event_id")
     )
-    List<Events> fav_event;
+    private List<Events> fav_event;
 }

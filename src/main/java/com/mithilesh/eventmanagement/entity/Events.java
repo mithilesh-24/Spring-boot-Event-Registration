@@ -20,16 +20,16 @@ public class Events {
 
     @ManyToOne
     @JoinColumn(name = "state_id")
-    States state;
-    long popularity_score;
-    LocalDate event_date;
-    LocalDate registration_end_date;
-    String description;
-    String venue;
+    private States state;
+    private long popularity_score;
+    private LocalDate event_date;
+    private LocalDate registration_end_date;
+    private String description;
+    private String venue;
 
     @ManyToMany(mappedBy = "reg_events")
-    List<Users> reg_users;
+    private List<Users> reg_users;
 
     @ManyToMany(mappedBy = "fav_events")
-    List<Users> fav_users;
+    private List<Users> fav_users;
 }
