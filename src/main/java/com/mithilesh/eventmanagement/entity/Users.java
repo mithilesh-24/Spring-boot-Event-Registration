@@ -20,10 +20,10 @@ public class Users {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long user_id;
+    private long userId;
 
-    private String first_name;
-    private String last_name;
+    private String firstName;
+    private String lastName;
     private LocalDate dob;
 
     @Enumerated(EnumType.STRING)
@@ -34,19 +34,14 @@ public class Users {
     @Enumerated(EnumType.STRING)
     private Role role = Role.USER;
 
-    @ManyToMany
-    @JoinTable(
-            name = "registration",
-            joinColumns =  @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "event_id")
-    )
-    private List<Events> reg_event;
+    @OneToMany(mappedBy = "user")
+    private List<Registration> registrations;
 
     @ManyToMany
     @JoinTable(
-            name = "faviorts",
+            name = "favorites",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "event_id")
     )
-    private List<Events> fav_event;
+    private List<Events> favEvents;
 }

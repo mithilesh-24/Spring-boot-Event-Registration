@@ -16,9 +16,9 @@ public class States {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long state_id;
+    private long stateId;
 
-    private String state_name;
+    private String stateName;
 
     @OneToMany(mappedBy = "state")
     private List<Events> events;

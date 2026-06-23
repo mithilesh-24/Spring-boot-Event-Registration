@@ -14,7 +14,7 @@ import java.time.Period;
 @Service
 @RequiredArgsConstructor
 public class AuthService {
-    final UserRepo repo;
+    final private UserRepo repo;
 
     public void register(SignupRequest dto){
 
@@ -22,8 +22,8 @@ public class AuthService {
             throw new AgeRestrictionException("User must be 18 years old");
 
         Users users = new Users();
-        users.setFirst_name(dto.getFirst_name());
-        users.setLast_name(dto.getLast_name());
+        users.setFirstName(dto.getFirstName());
+        users.setLastName(dto.getLastName());
         users.setDob(dto.getDob());
         users.setGender(dto.getGender());
         users.setPassword(dto.getPassword());

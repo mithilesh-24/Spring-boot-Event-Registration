@@ -13,23 +13,28 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "events")
 public class Events {
 
     @Id
-    long event_id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long eventId;
+
+    private String eventName;
 
     @ManyToOne
     @JoinColumn(name = "state_id")
     private States state;
-    private long popularity_score;
-    private LocalDate event_date;
-    private LocalDate registration_end_date;
+
+    private long popularityScore;
+    private LocalDate eventDate;
+    private LocalDate registrationEndDate;
     private String description;
     private String venue;
 
-    @ManyToMany(mappedBy = "reg_events")
-    private List<Users> reg_users;
+    @OneToMany(mappedBy = "event")
+    private List<Registration> registrations;
 
-    @ManyToMany(mappedBy = "fav_events")
-    private List<Users> fav_users;
+    @ManyToMany(mappedBy = "favEvents")
+    private List<Users> favUsers;
 }
