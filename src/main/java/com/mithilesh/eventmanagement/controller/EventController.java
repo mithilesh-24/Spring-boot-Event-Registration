@@ -13,13 +13,23 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class EventController {
 
-    final private EventService service;
+    private final EventService service;
 
     @PostMapping("/register")
     public ResponseEntity<?> registerEvent(@Valid @RequestBody EventRegisterRequest event){
-
+        service.registerEvent(event);
         return ResponseEntity.ok().body("Event Created");
     }
 
+    @GetMapping
+    public ResponseEntity<?> getEvents(){
+        return ResponseEntity.ok().body(service.getEvents());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getEventById(@PathVariable long id){
+
+        return ResponseEntity.ok().body(service.getEventById(id));
+    }
 
 }

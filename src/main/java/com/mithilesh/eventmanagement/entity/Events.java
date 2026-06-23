@@ -26,7 +26,7 @@ public class Events {
     @JoinColumn(name = "state_id")
     private States state;
 
-    private long popularityScore;
+    private long popularityScores = 0;
     private LocalDate eventDate;
     private LocalDate registrationEndDate;
     private String description;

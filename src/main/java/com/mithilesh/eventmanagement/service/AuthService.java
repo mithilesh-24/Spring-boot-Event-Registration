@@ -14,7 +14,7 @@ import java.time.Period;
 @Service
 @RequiredArgsConstructor
 public class AuthService {
-    final private UserRepo repo;
+    final private UserRepo userRepo;
 
     public void register(SignupRequest dto){
 
@@ -27,8 +27,9 @@ public class AuthService {
         users.setDob(dto.getDob());
         users.setGender(dto.getGender());
         users.setPassword(dto.getPassword());
+        users.setEmail(dto.getEmail());
 
-        repo.save(users);
+        userRepo.save(users);
     }
 
     public void login(LoginRequest dto){
