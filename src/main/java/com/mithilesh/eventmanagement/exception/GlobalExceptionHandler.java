@@ -1,5 +1,6 @@
 package com.mithilesh.eventmanagement.exception;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -13,16 +14,12 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(EventNotFoundException.class)
-    public ResponseEntity<?> handeEventNotFound(EventNotFoundException ex){
-        return ResponseEntity.badRequest().body(ex.getMessage());
+    public ResponseEntity<String> handeEventNotFound(EventNotFoundException ex){
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 
     @ExceptionHandler(EventDateException.class)
-    public ResponseEntity<?> handleEventDate(EventDateException ex){
-        return ResponseEntity.badRequest().body(ex.getMessage());
-    }
-    @ExceptionHandler(StateNotFoundException.class)
-    public ResponseEntity<?> handleStateNotFound(StateNotFoundException ex){
+    public ResponseEntity<String> handleEventDate(EventDateException ex){
         return ResponseEntity.badRequest().body(ex.getMessage());
     }
 }

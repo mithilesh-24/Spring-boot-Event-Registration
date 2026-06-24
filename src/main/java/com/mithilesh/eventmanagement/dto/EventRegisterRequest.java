@@ -14,7 +14,7 @@ public class EventRegisterRequest {
     private String eventName;
 
     @NotNull(message = "State Name is required")
-    private long stateId;
+    private String stateName;
 
     @NotNull(message = "Event Date is required")
     private LocalDate eventDate;

@@ -15,7 +15,7 @@ import java.util.List;
 public class States {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long stateId;
 
     private String stateName;

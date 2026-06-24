@@ -4,7 +4,9 @@ package com.mithilesh.eventmanagement.controller;
 import com.mithilesh.eventmanagement.dto.EventRegisterRequest;
 import com.mithilesh.eventmanagement.service.EventService;
 import jakarta.validation.Valid;
+import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,9 +18,9 @@ public class EventController {
     private final EventService service;
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerEvent(@Valid @RequestBody EventRegisterRequest event){
-        service.registerEvent(event);
-        return ResponseEntity.ok().body("Event Created");
+    public ResponseEntity<?> createEvent(@Valid @RequestBody EventRegisterRequest event){
+        service.createEvent(event);
+        return ResponseEntity.status(HttpStatus.CREATED).body("Event Created");
     }
 
     @GetMapping
@@ -30,6 +32,26 @@ public class EventController {
     public ResponseEntity<?> getEventById(@PathVariable long id){
 
         return ResponseEntity.ok().body(service.getEventById(id));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateEvent(@PathVariable long id,@RequestBody EventRegisterRequest request){
+
+        service.updateEvent(id,request);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteEvent(@PathVariable long id){
+        service.deleteEventById(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<?> searchEvent(@RequestParam String eventName){
+
+        return ResponseEntity.ok().body(service.getEventsBySearch(eventName));
     }
 
 }
