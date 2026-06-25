@@ -14,6 +14,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -51,9 +53,11 @@ public class EventService {
     }
 
     public List<EventResponse> getEvents() {
+
         return eventRepo.findAll()
                 .stream()
                 .map(events -> EventMapper.toResponse(events))
+                .sorted((a, b) -> a.getEventName().compareTo(b.getEventName()))
                 .toList();
     }
 

@@ -2,7 +2,6 @@ package com.mithilesh.eventmanagement.mapper;
 
 import com.mithilesh.eventmanagement.dto.EventResponse;
 import com.mithilesh.eventmanagement.entity.Events;
-import com.mithilesh.eventmanagement.entity.States;
 
 public class EventMapper {
 

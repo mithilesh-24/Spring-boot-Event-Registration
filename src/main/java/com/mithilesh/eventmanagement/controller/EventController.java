@@ -17,7 +17,7 @@ public class EventController {
 
     private final EventService service;
 
-    @PostMapping("/register")
+    @PostMapping("/create")
     public ResponseEntity<?> createEvent(@Valid @RequestBody EventRegisterRequest event){
         service.createEvent(event);
         return ResponseEntity.status(HttpStatus.CREATED).body("Event Created");
@@ -52,6 +52,13 @@ public class EventController {
     public ResponseEntity<?> searchEvent(@RequestParam String eventName){
 
         return ResponseEntity.ok().body(service.getEventsBySearch(eventName));
+    }
+
+    @PostMapping("/register/{id}")
+    public ResponseEntity<String> registerEvent(@PathVariable long id){
+
+
+        return ResponseEntity.ok("Register Event");
     }
 
 }
