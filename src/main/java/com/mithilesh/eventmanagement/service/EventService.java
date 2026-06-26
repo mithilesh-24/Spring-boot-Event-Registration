@@ -116,15 +116,11 @@ public class EventService {
                 .toList();
     }
 
-    public void registerEvent(long id) {
+    public void registerEvent(long id,String email) {
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if(authentication == null){
-            throw new NotAuthenticationException("Invalid authentication");
+        if(email == null){
+          throw new UserNotFoundException("Email not found");
         }
-
-        String email = authentication.getName();
 
         Users user = userRepo.findByEmail(email).orElseThrow(() -> new UserNotFoundException("Invalid user to register"));
 

@@ -2,12 +2,14 @@ package com.mithilesh.eventmanagement.controller;
 
 
 import com.mithilesh.eventmanagement.dto.EventRegisterRequest;
+import com.mithilesh.eventmanagement.security.UserPrincipal;
 import com.mithilesh.eventmanagement.service.EventService;
 import jakarta.validation.Valid;
 import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -55,9 +57,9 @@ public class EventController {
     }
 
     @PostMapping("/register/{id}")
-    public ResponseEntity<String> registerEvent(@PathVariable long id){
+    public ResponseEntity<String> registerEvent(@PathVariable long id, @AuthenticationPrincipal UserPrincipal userPrincipal){
 
-        service.registerEvent(id);
+        service.registerEvent(id,userPrincipal.getUsername());
         return ResponseEntity.ok("Register Event");
     }
 
