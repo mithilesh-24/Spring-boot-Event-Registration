@@ -57,7 +57,7 @@ public class EventController {
     @PostMapping("/register/{id}")
     public ResponseEntity<String> registerEvent(@PathVariable long id){
 
-
+        service.registerEvent(id);
         return ResponseEntity.ok("Register Event");
     }
 

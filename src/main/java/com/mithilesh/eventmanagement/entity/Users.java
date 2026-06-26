@@ -37,11 +37,6 @@ public class Users {
     @OneToMany(mappedBy = "user")
     private List<Registration> registrations;
 
-    @ManyToMany
-    @JoinTable(
-            name = "favorites",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "event_id")
-    )
-    private List<Events> favEvents;
+    @OneToMany(mappedBy = "user")
+    private List<Favorites> favEvents;
 }

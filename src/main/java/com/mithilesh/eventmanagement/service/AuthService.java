@@ -5,6 +5,7 @@ import com.mithilesh.eventmanagement.dto.SignupRequest;
 import com.mithilesh.eventmanagement.entity.Users;
 import com.mithilesh.eventmanagement.exception.AgeRestrictionException;
 import com.mithilesh.eventmanagement.repository.UserRepo;
+import com.mithilesh.eventmanagement.security.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -19,6 +20,8 @@ import java.time.Period;
 public class AuthService {
     private final UserRepo userRepo;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
+
     public void register(SignupRequest dto){
 
         if (Period.between(dto.getDob(), LocalDate.now()).getYears() < 18)
@@ -35,9 +38,9 @@ public class AuthService {
         userRepo.save(users);
     }
 
-    public void login(LoginRequest dto){
+    public String login(LoginRequest dto){
         Authentication authentication = new UsernamePasswordAuthenticationToken(dto.getEmail(),dto.getPassword());
 
-
+        return jwtService.generateKey(dto.getEmail());
     }
 }

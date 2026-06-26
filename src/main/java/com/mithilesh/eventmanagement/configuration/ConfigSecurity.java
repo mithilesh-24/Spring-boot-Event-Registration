@@ -1,6 +1,7 @@
 package com.mithilesh.eventmanagement.configuration;
 
 
+import com.mithilesh.eventmanagement.security.JwtFilter;
 import com.mithilesh.eventmanagement.security.MyUserDetailService;
 import com.sun.net.httpserver.HttpsConfigurator;
 import lombok.RequiredArgsConstructor;
@@ -15,21 +16,26 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class ConfigSecurity {
 
-    private final PasswordEncoder passwordEncoder;
     private final MyUserDetailService myUserDetailService;
-
+    private final JwtFilter jwtFilter;
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http){
 
         return http
                 .csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(req -> req.anyRequest().authenticated())
+                .authorizeHttpRequests(req -> req
+                        .requestMatchers("api/auth/**")
+                        .permitAll()
+                        .anyRequest()
+                        .authenticated())
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 
@@ -39,9 +45,9 @@ public class ConfigSecurity {
     }
 
     @Bean
-    public AuthenticationProvider authenticationManager(){
+    public AuthenticationProvider authenticationProvider(){
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider(myUserDetailService);
-        provider.setPasswordEncoder(passwordEncoder);
+        provider.setPasswordEncoder(passwordEncoder());
         return provider;
     }
 

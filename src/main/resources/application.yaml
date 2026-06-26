@@ -12,3 +12,6 @@ server:
   port: 8090
   servlet:
     context-path: /api
+
+jwt:
+  secret: ${JWT_SECRET}

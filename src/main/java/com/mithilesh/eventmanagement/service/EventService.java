@@ -4,14 +4,22 @@ package com.mithilesh.eventmanagement.service;
 import com.mithilesh.eventmanagement.dto.EventRegisterRequest;
 import com.mithilesh.eventmanagement.dto.EventResponse;
 import com.mithilesh.eventmanagement.entity.Events;
+import com.mithilesh.eventmanagement.entity.Registration;
 import com.mithilesh.eventmanagement.entity.States;
+import com.mithilesh.eventmanagement.entity.Users;
 import com.mithilesh.eventmanagement.exception.EventDateException;
 import com.mithilesh.eventmanagement.exception.EventNotFoundException;
+import com.mithilesh.eventmanagement.exception.NotAuthenticationException;
+import com.mithilesh.eventmanagement.exception.UserNotFoundException;
 import com.mithilesh.eventmanagement.mapper.EventMapper;
 import com.mithilesh.eventmanagement.repository.EventRepo;
+import com.mithilesh.eventmanagement.repository.RegistrationRepo;
 import com.mithilesh.eventmanagement.repository.StateRepo;
+import com.mithilesh.eventmanagement.repository.UserRepo;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.Collections;
@@ -23,6 +31,8 @@ import java.util.List;
 public class EventService {
     final private EventRepo eventRepo;
     final private StateRepo stateRepo;
+    final private RegistrationRepo registrationRepo;
+    final private UserRepo userRepo;
 
     public void createEvent(EventRegisterRequest request){
        Events events = new Events();
@@ -90,6 +100,7 @@ public class EventService {
 
         eventRepo.save(events);
     }
+
     public void deleteEventById(long id){
         eventRepo.findById(id).orElseThrow(
                 ()->new EventNotFoundException("Invalid event to delete")
@@ -103,5 +114,26 @@ public class EventService {
                 .stream()
                 .map(events -> EventMapper.toResponse(events))
                 .toList();
+    }
+
+    public void registerEvent(long id) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if(authentication == null){
+            throw new NotAuthenticationException("Invalid authentication");
+        }
+
+        String email = authentication.getName();
+
+        Users user = userRepo.findByEmail(email).orElseThrow(() -> new UserNotFoundException("Invalid user to register"));
+
+        Events events = eventRepo.findById(id).orElseThrow(() -> new EventNotFoundException("Event not found"));
+
+        Registration registration = new Registration();
+        registration.setEvent(events);
+        registration.setUser(user);
+
+        registrationRepo.save(registration);
     }
 }

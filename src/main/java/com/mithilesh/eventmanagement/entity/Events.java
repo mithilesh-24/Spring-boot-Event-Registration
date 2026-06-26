@@ -35,6 +35,6 @@ public class Events {
     @OneToMany(mappedBy = "event")
     private List<Registration> registrations;
 
-    @ManyToMany(mappedBy = "favEvents")
+    @OneToMany(mappedBy = "event")
     private List<Users> favUsers;
 }
