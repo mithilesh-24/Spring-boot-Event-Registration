@@ -3,12 +3,11 @@ package com.mithilesh.eventmanagement.controller;
 import com.mithilesh.eventmanagement.security.UserPrincipal;
 import com.mithilesh.eventmanagement.service.FavoriteService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import java.util.List;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,6 +20,20 @@ public class FavoriteController {
     public ResponseEntity<?> getFavorites(@AuthenticationPrincipal UserPrincipal userPrincipal){
 
         return ResponseEntity.ok().body(favoriteService.getFavorites(userPrincipal.getUsername()));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> addFavorites(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable long id){
+
+        favoriteService.addFavorites(userPrincipal.getUsername(),id);
+        return ResponseEntity.status(HttpStatus.CREATED).body("added the record");
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteFavorites(@AuthenticationPrincipal UserPrincipal userPrincipal,@PathVariable long id){
+        favoriteService.deleteFavorites(userPrincipal.getUsername(),id);
+
+        return ResponseEntity.ok("Deleted Successfully");
     }
 
 }

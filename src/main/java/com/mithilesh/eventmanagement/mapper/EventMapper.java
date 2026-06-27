@@ -8,6 +8,7 @@ public class EventMapper {
     public static EventResponse toResponse(Events events){
         return
                 new EventResponse(
+                        events.getEventId(),
                         events.getEventName(),
                         events.getState().getStateName(),
                         events.getPopularityScores(),

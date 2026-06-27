@@ -11,6 +11,7 @@ import java.time.LocalDate;
 @RequiredArgsConstructor
 public class EventResponse {
 
+    private long eventId;
     private String eventName;
     private String StateName;
     private long popularityScores = 0;
