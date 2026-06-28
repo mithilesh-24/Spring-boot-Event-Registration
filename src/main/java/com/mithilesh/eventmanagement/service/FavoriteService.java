@@ -49,5 +49,7 @@ public class FavoriteService {
         Favorites favorites = favoriteRepo
                 .findByUser_EmailAndEvent_EventId(email,id)
                 .orElseThrow(() -> new EventNotFoundException("Invalid event id to delete"));
+
+        favoriteRepo.delete(favorites);
     }
 }

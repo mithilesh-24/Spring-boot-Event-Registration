@@ -7,9 +7,9 @@ import com.mithilesh.eventmanagement.entity.Events;
 import com.mithilesh.eventmanagement.entity.Registration;
 import com.mithilesh.eventmanagement.entity.States;
 import com.mithilesh.eventmanagement.entity.Users;
+import com.mithilesh.eventmanagement.exception.EventAlreadyExist;
 import com.mithilesh.eventmanagement.exception.EventDateException;
 import com.mithilesh.eventmanagement.exception.EventNotFoundException;
-import com.mithilesh.eventmanagement.exception.NotAuthenticationException;
 import com.mithilesh.eventmanagement.exception.UserNotFoundException;
 import com.mithilesh.eventmanagement.mapper.EventMapper;
 import com.mithilesh.eventmanagement.repository.EventRepo;
@@ -18,12 +18,8 @@ import com.mithilesh.eventmanagement.repository.StateRepo;
 import com.mithilesh.eventmanagement.repository.UserRepo;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -36,7 +32,12 @@ public class EventService {
 
     public void createEvent(EventRegisterRequest request){
        Events events = new Events();
-        LocalDate today = LocalDate.now();
+       LocalDate today = LocalDate.now();
+
+        eventRepo.findByEventName(request.getEventName()).ifPresent(
+                e -> {
+                    throw new EventAlreadyExist("Event Already Exist");
+                });
 
         if(request.getEventDate().isBefore(today.plusDays(10)))
             throw new EventNotFoundException("Event date must be at least 15 days from today");
@@ -51,7 +52,7 @@ public class EventService {
         });
 
         events.setEventName(request.getEventName());
-        events.setDescription(request.getDiscription());
+        events.setDescription(request.getDescription());
         events.setPopularityScores(0);
         events.setRegistrationEndDate(request.getRegistrationEndDate());
         events.setEventDate(request.getEventDate());
@@ -79,7 +80,7 @@ public class EventService {
         return EventMapper.toResponse(event);
     }
 
-    public void updateEvent(long id,EventRegisterRequest request){
+    public EventResponse updateEvent(long id,EventRegisterRequest request){
         Events events = eventRepo.findById(id).orElseThrow(
                 () -> new EventNotFoundException("To update the event, the give id is invalid")
         );
@@ -95,10 +96,12 @@ public class EventService {
         events.setEventDate(request.getEventDate());
         events.setEventName(request.getEventName());
         events.setRegistrationEndDate(request.getRegistrationEndDate());
-        events.setDescription(request.getDiscription());
+        events.setDescription(request.getDescription());
         events.setVenue(request.getVenue());
 
         eventRepo.save(events);
+
+        return EventMapper.toResponse(events);
     }
 
     public void deleteEventById(long id){

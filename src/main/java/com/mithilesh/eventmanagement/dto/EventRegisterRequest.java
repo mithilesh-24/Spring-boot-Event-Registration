@@ -22,8 +22,8 @@ public class EventRegisterRequest {
     @NotNull(message = "Registration end date is required")
     private LocalDate registrationEndDate;
 
-    @NotBlank(message = "Discription is required")
-    private String discription;
+    @NotBlank(message = "Description is required")
+    private String description;
 
     @NotBlank(message = "Venue is required")
     private String venue;

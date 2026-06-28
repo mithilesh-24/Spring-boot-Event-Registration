@@ -1,5 +1,6 @@
 package com.mithilesh.eventmanagement.controller;
 
+import com.mithilesh.eventmanagement.dto.ApiResponse;
 import com.mithilesh.eventmanagement.security.UserPrincipal;
 import com.mithilesh.eventmanagement.service.FavoriteService;
 import lombok.RequiredArgsConstructor;
@@ -19,21 +20,39 @@ public class FavoriteController {
     @GetMapping
     public ResponseEntity<?> getFavorites(@AuthenticationPrincipal UserPrincipal userPrincipal){
 
-        return ResponseEntity.ok().body(favoriteService.getFavorites(userPrincipal.getUsername()));
+        return ResponseEntity.ok().body(
+                new ApiResponse<>(
+                        200,
+                        "returning favorites event",
+                        favoriteService.getFavorites(userPrincipal.getUsername())
+                )
+        );
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> addFavorites(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable long id){
 
         favoriteService.addFavorites(userPrincipal.getUsername(),id);
-        return ResponseEntity.status(HttpStatus.CREATED).body("added the record");
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+                new ApiResponse<>(
+                        201,
+                        "Successfully added",
+                        null
+                )
+        );
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteFavorites(@AuthenticationPrincipal UserPrincipal userPrincipal,@PathVariable long id){
         favoriteService.deleteFavorites(userPrincipal.getUsername(),id);
 
-        return ResponseEntity.ok("Deleted Successfully");
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        204,
+                        "Deleted Successfully",
+                        null
+                )
+        );
     }
 
 }

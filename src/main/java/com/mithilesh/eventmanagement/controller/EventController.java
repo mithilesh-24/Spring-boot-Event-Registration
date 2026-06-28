@@ -1,6 +1,7 @@
 package com.mithilesh.eventmanagement.controller;
 
 
+import com.mithilesh.eventmanagement.dto.ApiResponse;
 import com.mithilesh.eventmanagement.dto.EventRegisterRequest;
 import com.mithilesh.eventmanagement.security.UserPrincipal;
 import com.mithilesh.eventmanagement.service.EventService;
@@ -22,45 +23,85 @@ public class EventController {
     @PostMapping("/create")
     public ResponseEntity<?> createEvent(@Valid @RequestBody EventRegisterRequest event){
         service.createEvent(event);
-        return ResponseEntity.status(HttpStatus.CREATED).body("Event Created");
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+                new ApiResponse<>(
+                        201,
+                        "Created Event",
+                        null
+                )
+        );
     }
 
     @GetMapping
     public ResponseEntity<?> getEvents(){
-        return ResponseEntity.ok().body(service.getEvents());
+        return ResponseEntity.ok().body(
+                new ApiResponse<>(
+                        200,
+                        "All event",
+                        service.getEvents()
+                )
+        );
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getEventById(@PathVariable long id){
 
-        return ResponseEntity.ok().body(service.getEventById(id));
+        return ResponseEntity.ok().body(
+                new ApiResponse<>(
+                        200,
+                        "Success",
+                        service.getEventById(id)
+                )
+        );
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateEvent(@PathVariable long id,@RequestBody EventRegisterRequest request){
 
-        service.updateEvent(id,request);
-
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().body(
+                new ApiResponse<>(
+                        204,
+                        "Updated the event",
+                        service.updateEvent(id,request)
+                )
+        );
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteEvent(@PathVariable long id){
         service.deleteEventById(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(
+          new ApiResponse<>(
+                  204,
+                  "Event Deleted",
+                  null
+          )
+        );
     }
 
     @GetMapping("/search")
     public ResponseEntity<?> searchEvent(@RequestParam String eventName){
 
-        return ResponseEntity.ok().body(service.getEventsBySearch(eventName));
+        return ResponseEntity.ok().body(
+                new ApiResponse<>(
+                        200,
+                        "Success",
+                        service.getEventsBySearch(eventName)
+                )
+        );
     }
 
     @PostMapping("/register/{id}")
-    public ResponseEntity<String> registerEvent(@PathVariable long id, @AuthenticationPrincipal UserPrincipal userPrincipal){
+    public ResponseEntity<?> registerEvent(@PathVariable long id, @AuthenticationPrincipal UserPrincipal userPrincipal){
 
         service.registerEvent(id,userPrincipal.getUsername());
-        return ResponseEntity.ok("Register Event");
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        200,
+                        "Event Register",
+                        null
+                )
+        );
     }
 
 }

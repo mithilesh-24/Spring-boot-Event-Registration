@@ -26,4 +26,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleInvalidUserPassword(InvalidUserPasswordException ex){
         return ResponseEntity.badRequest().body(ex.getMessage());
     }
+    @ExceptionHandler(EventAlreadyExist.class)
+    public ResponseEntity<String> handleEventAlreadyExist(EventAlreadyExist ex){
+        return ResponseEntity.badRequest().body(ex.getMessage());
+    }
 }

@@ -32,7 +32,7 @@ public class ConfigSecurity {
         return http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(req -> req
-                        .requestMatchers("api/auth/**")
+                        .requestMatchers("/auth/**")
                         .permitAll()
                         .anyRequest()
                         .authenticated())
