@@ -10,8 +10,11 @@ import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/event")
@@ -33,24 +36,34 @@ public class EventController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getEvents(){
+    public ResponseEntity<?> getEvents(Authentication authentication){
+        List<?> result = null;
+
+        if(authentication == null || !authentication.isAuthenticated()){
+            result = service.getEvents();
+        }
+        else{
+            UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
+            result = service.getEvents(userPrincipal.getUsername());
+        }
+
         return ResponseEntity.ok().body(
                 new ApiResponse<>(
                         200,
                         "All event",
-                        service.getEvents()
+                        result
                 )
         );
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getEventById(@PathVariable long id){
+    public ResponseEntity<?> getEventById(@PathVariable long id,@AuthenticationPrincipal UserPrincipal userPrincipal){
 
         return ResponseEntity.ok().body(
                 new ApiResponse<>(
                         200,
                         "Success",
-                        service.getEventById(id)
+                        service.getEventById(id,userPrincipal.getUsername())
                 )
         );
     }
@@ -91,7 +104,7 @@ public class EventController {
         );
     }
 
-    @PostMapping("/register/{id}")
+    @GetMapping("/register/{id}")
     public ResponseEntity<?> registerEvent(@PathVariable long id, @AuthenticationPrincipal UserPrincipal userPrincipal){
 
         service.registerEvent(id,userPrincipal.getUsername());

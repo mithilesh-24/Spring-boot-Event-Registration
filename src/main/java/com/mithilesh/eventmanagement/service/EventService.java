@@ -3,24 +3,19 @@ package com.mithilesh.eventmanagement.service;
 
 import com.mithilesh.eventmanagement.dto.EventRegisterRequest;
 import com.mithilesh.eventmanagement.dto.EventResponse;
-import com.mithilesh.eventmanagement.entity.Events;
-import com.mithilesh.eventmanagement.entity.Registration;
-import com.mithilesh.eventmanagement.entity.States;
-import com.mithilesh.eventmanagement.entity.Users;
+import com.mithilesh.eventmanagement.entity.*;
 import com.mithilesh.eventmanagement.exception.EventAlreadyExist;
 import com.mithilesh.eventmanagement.exception.EventDateException;
 import com.mithilesh.eventmanagement.exception.EventNotFoundException;
 import com.mithilesh.eventmanagement.exception.UserNotFoundException;
 import com.mithilesh.eventmanagement.mapper.EventMapper;
-import com.mithilesh.eventmanagement.repository.EventRepo;
-import com.mithilesh.eventmanagement.repository.RegistrationRepo;
-import com.mithilesh.eventmanagement.repository.StateRepo;
-import com.mithilesh.eventmanagement.repository.UserRepo;
+import com.mithilesh.eventmanagement.repository.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -29,7 +24,10 @@ public class EventService {
     final private StateRepo stateRepo;
     final private RegistrationRepo registrationRepo;
     final private UserRepo userRepo;
+    final private EventViewsRepo eventViewsRepo;
+    final private FavoriteRepo favoriteRepo;
 
+    @Transactional
     public void createEvent(EventRegisterRequest request){
        Events events = new Events();
        LocalDate today = LocalDate.now();
@@ -64,7 +62,6 @@ public class EventService {
     }
 
     public List<EventResponse> getEvents() {
-
         return eventRepo.findAll()
                 .stream()
                 .map(events -> EventMapper.toResponse(events))
@@ -72,14 +69,31 @@ public class EventService {
                 .toList();
     }
 
+    public List<?> getEvents(String email){
+        return eventRepo.findSortedEvent(email)
+                .stream()
+                .map(EventMapper::toResponse)
+                .toList();
+    }
+
     @Transactional
-    public EventResponse getEventById(long id) {
+    public EventResponse getEventById(long id,String email) {
         Events event =  eventRepo.findById(id).orElseThrow(() -> new EventNotFoundException("Event not Found"));
-        event.setPopularityScores(event.getPopularityScores()+1);
+        Users user = userRepo.findByEmail(email).orElseThrow(() ->new UserNotFoundException("Invalid user"));
+
+        if(eventViewsRepo.findByUsers_EmailAndEvent_EventId(email,id).isEmpty()){
+            event.setPopularityScores(event.getPopularityScores() + 1);
+            EventViews popularity = new EventViews();
+            popularity.setUsers(user);
+            popularity.setEvent(event);
+
+            eventViewsRepo.save(popularity);
+        }
         
         return EventMapper.toResponse(event);
     }
 
+    @Transactional
     public EventResponse updateEvent(long id,EventRegisterRequest request){
         Events events = eventRepo.findById(id).orElseThrow(
                 () -> new EventNotFoundException("To update the event, the give id is invalid")
@@ -104,11 +118,17 @@ public class EventService {
         return EventMapper.toResponse(events);
     }
 
+    @Transactional
     public void deleteEventById(long id){
-        eventRepo.findById(id).orElseThrow(
+        Events events = eventRepo.findById(id).orElseThrow(
                 ()->new EventNotFoundException("Invalid event to delete")
         );
-        eventRepo.deleteById(id);
+
+        favoriteRepo.deleteByEvent(events);
+        registrationRepo.deleteByEvent(events);
+        eventViewsRepo.deleteByEvent(events);
+
+        eventRepo.delete(events);
     }
 
     public List<?> getEventsBySearch(String eventName) {
@@ -119,6 +139,7 @@ public class EventService {
                 .toList();
     }
 
+    @Transactional
     public void registerEvent(long id,String email) {
 
         if(email == null){

@@ -13,7 +13,7 @@ public class EventRegisterRequest {
     @NotBlank(message = "Event name is required")
     private String eventName;
 
-    @NotNull(message = "State Name is required")
+    @NotBlank(message = "State Name is required")
     private String stateName;
 
     @NotNull(message = "Event Date is required")

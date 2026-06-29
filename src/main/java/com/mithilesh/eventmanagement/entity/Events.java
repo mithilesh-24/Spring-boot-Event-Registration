@@ -37,4 +37,7 @@ public class Events {
 
     @OneToMany(mappedBy = "event")
     private List<Favorites> favUsers;
+
+    @OneToMany(mappedBy = "event")
+    private List<EventViews> views;
 }

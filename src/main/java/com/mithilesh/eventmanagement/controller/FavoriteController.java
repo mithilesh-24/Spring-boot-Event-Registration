@@ -2,10 +2,9 @@ package com.mithilesh.eventmanagement.controller;
 
 import com.mithilesh.eventmanagement.dto.ApiResponse;
 import com.mithilesh.eventmanagement.security.UserPrincipal;
-import com.mithilesh.eventmanagement.service.FavoriteService;
+import com.mithilesh.eventmanagement.service.FavoritesService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -15,8 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/favorites")
 public class FavoriteController {
 
-    private final FavoriteService favoriteService;
-
+    private final FavoritesService favoritesService;
     @GetMapping
     public ResponseEntity<?> getFavorites(@AuthenticationPrincipal UserPrincipal userPrincipal){
 
@@ -24,7 +22,7 @@ public class FavoriteController {
                 new ApiResponse<>(
                         200,
                         "returning favorites event",
-                        favoriteService.getFavorites(userPrincipal.getUsername())
+                        favoritesService.getFavorites(userPrincipal.getUsername())
                 )
         );
     }
@@ -32,7 +30,7 @@ public class FavoriteController {
     @GetMapping("/{id}")
     public ResponseEntity<?> addFavorites(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable long id){
 
-        favoriteService.addFavorites(userPrincipal.getUsername(),id);
+        favoritesService.addFavorites(userPrincipal.getUsername(),id);
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 new ApiResponse<>(
                         201,
@@ -44,7 +42,7 @@ public class FavoriteController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteFavorites(@AuthenticationPrincipal UserPrincipal userPrincipal,@PathVariable long id){
-        favoriteService.deleteFavorites(userPrincipal.getUsername(),id);
+        favoritesService.deleteFavorites(userPrincipal.getUsername(),id);
 
         return ResponseEntity.ok(
                 new ApiResponse<>(

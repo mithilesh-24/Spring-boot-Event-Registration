@@ -20,5 +20,18 @@ public interface EventRepo extends JpaRepository<Events,Long> {
         where replace(lower(e.eventName),' ','') =
             replace (lower(:eventName),' ','' )
     """)
-    Optional<Events> findByEventName(@Param("eventName") String eventname);
+    Optional<Events> findByEventName( String eventName);
+
+
+    @Query("""
+        SELECT e
+        FROM Events e
+        LEFT JOIN Favorites f
+        ON f.event = e AND f.user.email = :email
+        ORDER BY
+            e.state.stateName,
+            CASE WHEN f.favoritesId = NULL THEN 0 ELSE 1 END DESC,
+            e.popularityScores DESC
+""")
+    List<Events> findSortedEvent(String email);
 }

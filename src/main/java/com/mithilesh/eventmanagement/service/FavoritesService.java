@@ -11,7 +11,7 @@ import com.mithilesh.eventmanagement.mapper.EventMapper;
 import com.mithilesh.eventmanagement.repository.EventRepo;
 import com.mithilesh.eventmanagement.repository.FavoriteRepo;
 import com.mithilesh.eventmanagement.repository.UserRepo;
-import com.mithilesh.eventmanagement.security.UserPrincipal;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +19,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class FavoriteService {
+public class FavoritesService {
     private final UserRepo userRepo;
     private final FavoriteRepo favoriteRepo;
     private final EventRepo eventRepo;
@@ -32,6 +32,7 @@ public class FavoriteService {
                 .toList();
     }
 
+    @Transactional
     public void addFavorites(String email,long id) {
         Users users = userRepo.findByEmail(email).orElseThrow(() -> new UserNotFoundException("Invalid email"));
 
@@ -44,6 +45,7 @@ public class FavoriteService {
         favoriteRepo.save(favorites);
     }
 
+    @Transactional
     public void deleteFavorites(String email, long id) {
 
         Favorites favorites = favoriteRepo
