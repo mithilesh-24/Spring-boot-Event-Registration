@@ -7,6 +7,7 @@ import com.sun.net.httpserver.HttpsConfigurator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -32,10 +33,23 @@ public class ConfigSecurity {
         return http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(req -> req
-                        .requestMatchers("/auth/**")
-                        .permitAll()
-                        .anyRequest()
-                        .authenticated())
+                        .requestMatchers("/auth/**","/event").permitAll()
+
+                        .requestMatchers(HttpMethod.GET,
+                                "/event/register/{id}",
+                                "/event/search",
+                                "/event/{id}"
+                        ).hasAnyRole("USER","ADMIN")
+
+                        .requestMatchers(HttpMethod.DELETE,
+                                "/event/{id}").hasRole("ADMIN")
+
+                        .requestMatchers(HttpMethod.POST,"/event/create").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT,"/event/{id}").hasRole("ADMIN")
+
+                        .requestMatchers("/favorites/**").hasRole("USER")
+
+                        .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();

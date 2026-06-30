@@ -1,6 +1,8 @@
 package com.mithilesh.eventmanagement.exception;
 
-public class InvalidUserPasswordException extends RuntimeException {
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+
+public class InvalidUserPasswordException extends UsernameNotFoundException {
     public InvalidUserPasswordException(String message) {
         super(message);
     }

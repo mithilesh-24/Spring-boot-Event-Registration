@@ -7,6 +7,7 @@ import com.mithilesh.eventmanagement.exception.AgeRestrictionException;
 import com.mithilesh.eventmanagement.repository.UserRepo;
 import com.mithilesh.eventmanagement.security.JwtService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,6 +22,7 @@ public class AuthService {
     private final UserRepo userRepo;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final AuthenticationManager authenticationManager;
 
     public void register(SignupRequest dto){
 
@@ -39,7 +41,7 @@ public class AuthService {
     }
 
     public String login(LoginRequest dto){
-        Authentication authentication = new UsernamePasswordAuthenticationToken(dto.getEmail(),dto.getPassword());
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(dto.getEmail(),dto.getPassword()));
 
         return jwtService.generateKey(dto.getEmail());
     }
