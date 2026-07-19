@@ -57,7 +57,7 @@ public class EventController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getEventById(@PathVariable long id,@AuthenticationPrincipal UserPrincipal userPrincipal){
+    public ResponseEntity<?> getEventById(@PathVariable long id,@AuthenticationPrincipal UserPrincipal userPrincipal) {
 
         return ResponseEntity.ok().body(
                 new ApiResponse<>(
