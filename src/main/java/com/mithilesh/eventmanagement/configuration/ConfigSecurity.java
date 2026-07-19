@@ -33,7 +33,12 @@ public class ConfigSecurity {
         return http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(req -> req
-                        .requestMatchers("/auth/**","/event").permitAll()
+                        .requestMatchers("/auth/**",
+                                "/event",
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**",
+                                "/swagger-ui.html"
+                        ).permitAll()
 
                         .requestMatchers(HttpMethod.GET,
                                 "/event/register/{id}",
