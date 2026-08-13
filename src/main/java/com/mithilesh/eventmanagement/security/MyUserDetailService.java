@@ -18,8 +18,14 @@ public class MyUserDetailService implements UserDetailsService {
 
     private final UserRepo userRepo;
 
+    /**
+     *
+     * @param email the username identifying the user whose data is required.
+     * @return return the data through UserPrincipal
+     * @throws InvalidUserPasswordException if the user not found
+     */
     @Override
-    public UserDetails loadUserByUsername(@NonNull String email) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(@NonNull String email) {
         Users users = userRepo.findByEmail(email).orElseThrow(
                 () -> new InvalidUserPasswordException("Invalid Email Or Password"));
 
