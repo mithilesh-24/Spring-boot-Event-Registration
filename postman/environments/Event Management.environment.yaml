@@ -1,0 +1,6 @@
+name: Event Management
+values:
+  - key: eventId
+    value: ''
+  - key: base
+    value: ''

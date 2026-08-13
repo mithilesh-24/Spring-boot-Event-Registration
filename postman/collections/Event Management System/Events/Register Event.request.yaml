@@ -1,0 +1,6 @@
+$kind: http-request
+name: Register Event
+url: http://localhost:8090/api/event/{{eventId}}/registrations
+method: POST
+examples: .resources/Register Event.resources/examples
+order: 1786526745081

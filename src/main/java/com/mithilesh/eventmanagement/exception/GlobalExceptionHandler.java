@@ -85,4 +85,10 @@ public class GlobalExceptionHandler {
                 )
         );
     }
+
+    @ExceptionHandler()
+    public ResponseEntity<?> handleUserAlreadyExisted(MethodArgumentNotValidException ex){
+
+        return ResponseEntity.badRequest().body("bad request");
+    }
 }

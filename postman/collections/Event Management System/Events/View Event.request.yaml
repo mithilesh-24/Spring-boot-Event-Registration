@@ -1,0 +1,5 @@
+$kind: http-request
+name: View Event
+url: "{{base}}/api/event"
+method: GET
+order: 4458536900229300

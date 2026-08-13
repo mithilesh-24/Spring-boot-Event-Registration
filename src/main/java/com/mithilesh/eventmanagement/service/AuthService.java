@@ -24,6 +24,13 @@ public class AuthService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
+    /**
+     * To save the user in DB
+     *
+     * @param dto contains the body to save in repository
+     * @throws UserAlreadyExistsException if the user already existed
+     * @throws AgeRestrictionException if the age is less than 18
+     */
     public void register(SignupRequest dto){
 
         if(userRepo.findByEmail(dto.getEmail()).isPresent()){
@@ -31,7 +38,7 @@ public class AuthService {
         }
 
         if (Period.between(dto.getDob(), LocalDate.now()).getYears() < 18)
-            throw new AgeRestrictionException("User must be atleast 18 years old");
+            throw new AgeRestrictionException("User must be Atleast 18 years old");
 
         Users users = new Users();
         users.setFirstName(dto.getFirstName());
@@ -44,6 +51,13 @@ public class AuthService {
         userRepo.save(users);
     }
 
+    /**
+     * Validate the user for login
+     *
+     * @param dto contains email and password
+     * @return Return Jwt token
+     * @throws com.mithilesh.eventmanagement.exception.InvalidUserPasswordException if is the email or password were not correct
+     */
     public String login(LoginRequest dto){
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(dto.getEmail(),dto.getPassword()));
 

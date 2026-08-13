@@ -1,0 +1,5 @@
+$kind: http-request
+name: Add Favorite
+url: "{{base}}/api/favorites/{{id}}"
+method: POST
+order: 1786526122224
