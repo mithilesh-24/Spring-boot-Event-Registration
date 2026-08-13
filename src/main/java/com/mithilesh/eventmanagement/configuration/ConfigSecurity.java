@@ -27,6 +27,12 @@ public class ConfigSecurity {
 
     private final MyUserDetailService myUserDetailService;
     private final JwtFilter jwtFilter;
+
+    /**
+     *
+     * @param http
+     * @return 
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http){
 

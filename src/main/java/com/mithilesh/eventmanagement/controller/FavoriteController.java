@@ -1,6 +1,6 @@
 package com.mithilesh.eventmanagement.controller;
 
-import com.mithilesh.eventmanagement.dto.ApiResponse;
+import com.mithilesh.eventmanagement.dto.Response.ApiResponse;
 import com.mithilesh.eventmanagement.security.UserPrincipal;
 import com.mithilesh.eventmanagement.service.FavoritesService;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +27,7 @@ public class FavoriteController {
         );
     }
 
-    @GetMapping("/{id}")
+    @PostMapping("/{id}")
     public ResponseEntity<?> addFavorites(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable long id){
 
         favoritesService.addFavorites(userPrincipal.getUsername(),id);

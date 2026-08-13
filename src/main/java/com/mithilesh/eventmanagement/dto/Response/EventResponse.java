@@ -1,4 +1,4 @@
-package com.mithilesh.eventmanagement.dto;
+package com.mithilesh.eventmanagement.dto.Response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

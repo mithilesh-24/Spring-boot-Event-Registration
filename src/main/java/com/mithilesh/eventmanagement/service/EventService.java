@@ -1,8 +1,8 @@
 package com.mithilesh.eventmanagement.service;
 
 
-import com.mithilesh.eventmanagement.dto.EventRegisterRequest;
-import com.mithilesh.eventmanagement.dto.EventResponse;
+import com.mithilesh.eventmanagement.dto.Request.EventRegisterRequest;
+import com.mithilesh.eventmanagement.dto.Response.EventResponse;
 import com.mithilesh.eventmanagement.entity.*;
 import com.mithilesh.eventmanagement.exception.EventAlreadyExist;
 import com.mithilesh.eventmanagement.exception.EventDateException;
@@ -15,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor

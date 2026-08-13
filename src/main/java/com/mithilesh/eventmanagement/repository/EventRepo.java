@@ -23,6 +23,7 @@ public interface EventRepo extends JpaRepository<Events,Long> {
     Optional<Events> findByEventName( String eventName);
 
 
+    //check this spring data jpa, write without query..
     @Query("""
         SELECT e
         FROM Events e
@@ -34,4 +35,7 @@ public interface EventRepo extends JpaRepository<Events,Long> {
             e.popularityScores DESC
 """)
     List<Events> findSortedEvent(String email);
+
+
+    List<Events> findByFavUsers_User_EmailOrderByState_StateNameAscEventNameAsc(String email);
 }

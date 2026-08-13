@@ -1,6 +1,6 @@
 package com.mithilesh.eventmanagement.exception;
 
-import com.mithilesh.eventmanagement.dto.ApiResponse;
+import com.mithilesh.eventmanagement.dto.Response.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;

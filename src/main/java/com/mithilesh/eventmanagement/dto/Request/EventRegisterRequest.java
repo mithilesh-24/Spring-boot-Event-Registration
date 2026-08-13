@@ -1,7 +1,6 @@
-package com.mithilesh.eventmanagement.dto;
+package com.mithilesh.eventmanagement.dto.Request;
 
 
-import com.mithilesh.eventmanagement.entity.States;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;

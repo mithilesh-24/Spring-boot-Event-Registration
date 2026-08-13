@@ -1,12 +1,11 @@
 package com.mithilesh.eventmanagement.controller;
 
 
-import com.mithilesh.eventmanagement.dto.ApiResponse;
-import com.mithilesh.eventmanagement.dto.EventRegisterRequest;
+import com.mithilesh.eventmanagement.dto.Response.ApiResponse;
+import com.mithilesh.eventmanagement.dto.Request.EventRegisterRequest;
 import com.mithilesh.eventmanagement.security.UserPrincipal;
 import com.mithilesh.eventmanagement.service.EventService;
 import jakarta.validation.Valid;
-import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +22,12 @@ public class EventController {
 
     private final EventService service;
 
-    @PostMapping("/create")
+    /**
+     *
+     * @param event
+     * @return
+     */
+    @PostMapping
     public ResponseEntity<?> createEvent(@Valid @RequestBody EventRegisterRequest event){
         service.createEvent(event);
         return ResponseEntity.status(HttpStatus.CREATED).body(
@@ -56,7 +60,7 @@ public class EventController {
         );
     }
 
-    @GetMapping("/{id}")
+    @PostMapping("/{id}/registrations")
     public ResponseEntity<?> getEventById(@PathVariable long id,@AuthenticationPrincipal UserPrincipal userPrincipal) {
 
         return ResponseEntity.ok().body(
@@ -104,7 +108,7 @@ public class EventController {
         );
     }
 
-    @GetMapping("/register/{id}")
+    @PostMapping("/{id}")
     public ResponseEntity<?> registerEvent(@PathVariable long id, @AuthenticationPrincipal UserPrincipal userPrincipal){
 
         service.registerEvent(id,userPrincipal.getUsername());

@@ -1,9 +1,8 @@
-package com.mithilesh.eventmanagement.dto;
+package com.mithilesh.eventmanagement.dto.Request;
 
 import com.mithilesh.eventmanagement.enums.Gender;
 import jakarta.validation.constraints.*;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
