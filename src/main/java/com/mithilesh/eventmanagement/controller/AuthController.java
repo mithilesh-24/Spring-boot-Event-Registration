@@ -20,11 +20,12 @@ public class AuthController {
     final private AuthService authService;
 
     /**
-     *Register a new user
+     * Register a new user
+     * The request body is validated
      *
      * @param user contains the user details
-     * @return respons message
-     * @throws
+     * @return response message indicating the success
+     * @throws  com.mithilesh.eventmanagement.exception.UserAlreadyExistsException if the email already existed
      */
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody SignupRequest user){
@@ -40,7 +41,13 @@ public class AuthController {
         );
     }
 
-
+    /**
+     * Login using email and password
+     * The request body is validated
+     *
+     * @param user contains email and password for login
+     * @return Response body containing success message and Jwt Token
+     */
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest user){
         return ResponseEntity.ok(

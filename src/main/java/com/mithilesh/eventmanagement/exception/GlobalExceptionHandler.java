@@ -2,6 +2,7 @@ package com.mithilesh.eventmanagement.exception;
 
 import com.mithilesh.eventmanagement.dto.Response.ApiResponse;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -13,13 +14,19 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    /**
+     * when the age is invalid it is thrown
+     * Invalid age should be greater than 18
+     *
+     * @param ex AgeRestrictionException
+     * @return ResponsEntity object
+     */
     @ExceptionHandler(AgeRestrictionException.class)
     public ResponseEntity<?> handleAgeRestriction(AgeRestrictionException ex) {
         return ResponseEntity.badRequest().body(
                 new ApiResponse<>(
-                        404,
-                        ex.getMessage(),
-                        null
+                        HttpStatus.BAD_REQUEST.value(),
+                        ex.getMessage()
                 )
         );
     }
@@ -46,13 +53,18 @@ public class GlobalExceptionHandler {
         );
     }
 
+    /**
+     * When the username or password is incorrect the exception is thrown
+     *
+     * @param ex which is the InvalidUserNameException
+     * @return Response object
+     */
     @ExceptionHandler(InvalidUserPasswordException.class)
     public ResponseEntity<?> handleInvalidUserPassword(InvalidUserPasswordException ex){
-        return ResponseEntity.badRequest().body(
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED.value()).body(
                 new ApiResponse<>(
-                        404,
-                        ex.getMessage(),
-                        null
+                        HttpStatus.UNAUTHORIZED.value(),
+                        ex.getMessage()
                 )
         );
     }
@@ -62,7 +74,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleEventAlreadyExist(EventAlreadyExist ex){
         return ResponseEntity.badRequest().body(
                 new ApiResponse<>(
-                        404,
+                        400,
                         ex.getMessage(),
                         null
                 )
@@ -82,6 +94,23 @@ public class GlobalExceptionHandler {
                         404,
                         "validation errors",
                         errors
+                )
+        );
+    }
+
+    /**
+     * Exception handler for user already existed
+     *
+     * @param ex which is the exception class
+     * @return ResponseEntity object
+     */
+    @ExceptionHandler()
+    public ResponseEntity<?> handleUserAlreadyExisted(UserAlreadyExistsException ex){
+
+        return ResponseEntity.status(HttpStatus.CONFLICT.value()).body(
+                new ApiResponse<>(
+                        HttpStatus.CONFLICT.value(),
+                        "User Already existed"
                 )
         );
     }
