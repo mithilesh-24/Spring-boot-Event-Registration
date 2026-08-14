@@ -95,7 +95,7 @@ public class EventController {
         return ResponseEntity.ok().body(
                 new ApiResponse<>(
                         200,
-                        "Success",
+                        "Event Found",
                         result
                 )
         );
@@ -114,7 +114,7 @@ public class EventController {
         return ResponseEntity.ok().body(
                 new ApiResponse<>(
                         204,
-                        "Updated the event",
+                        "Event is Updated",
                         service.updateEvent(id,request)
                 )
         );
@@ -132,7 +132,7 @@ public class EventController {
         return ResponseEntity.ok(
                 new ApiResponse<>(
                         204,
-                        "Event Deleted",
+                        "Event is Deleted",
                         null
                 )
         );
@@ -150,7 +150,7 @@ public class EventController {
         return ResponseEntity.ok().body(
                 new ApiResponse<>(
                         200,
-                        "Success",
+                        "Search result",
                         service.getEventsBySearch(eventName)
                 )
         );
