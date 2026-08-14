@@ -26,6 +26,13 @@ public class EventService {
     final private EventViewsRepo eventViewsRepo;
     final private FavoriteRepo favoriteRepo;
 
+    /**
+     * To create event
+     *
+     * @param request contains the date to create the event
+     * @throws EventDateException for date validation
+     * @throws EventAlreadyExist if the event already existed
+     */
     @Transactional
     public void createEvent(EventRegisterRequest request){
        Events events = new Events();
@@ -37,7 +44,7 @@ public class EventService {
                 });
 
         if(request.getEventDate().isBefore(today.plusDays(10)))
-            throw new EventNotFoundException("Event date must be at least 15 days from today");
+            throw new EventDateException("Event date must be at least 15 days from today");
 
         if(request.getRegistrationEndDate().isBefore(today.plusDays(5)))
             throw new EventDateException("Registration end date must be at least 5 from today");
@@ -60,22 +67,50 @@ public class EventService {
 
     }
 
+    /**
+     * To get the list of events
+     *
+     * if the user is not authenticated this is called
+     *
+     * @return list of event as Response object
+     */
     public List<EventResponse> getEvents() {
         return eventRepo.findAll()
                 .stream()
-                .map(events -> EventMapper.toResponse(events))
+                .map(EventMapper::toResponse)
                 .sorted((a, b) -> a.getEventName().compareTo(b.getEventName()))
                 .toList();
     }
 
+    /**
+     * to get the list of events
+     *
+     * if the user is authentication the list of events in sorted order
+     *
+     * @param email to get the user favorite events
+     * @return list of event
+     * @throws UserNotFoundException if the user not exist
+     */
     public List<?> getEvents(String email){
+        userRepo.findByEmail(email).orElseThrow(() -> new UserNotFoundException("Username not found"));
+
+
         return eventRepo.findSortedEvent(email)
                 .stream()
                 .map(EventMapper::toResponse)
                 .toList();
     }
 
-    @Transactional
+    /**
+     * To view specific event
+     * The user is athenticated and the view will be incremented if the user visit the event for first time
+     *
+     * @param id event id
+     * @param email user email
+     * @return event resposne contain event details
+     * @throws EventNotFoundException if the event is not found
+     * @throws UserNotFoundException if the user email is not found
+     */
     public EventResponse getEventById(long id,String email) {
         Events event =  eventRepo.findById(id).orElseThrow(() -> new EventNotFoundException("Event not Found"));
         Users user = userRepo.findByEmail(email).orElseThrow(() ->new UserNotFoundException("Invalid user"));
@@ -92,7 +127,27 @@ public class EventService {
         return EventMapper.toResponse(event);
     }
 
-    @Transactional
+    /**
+     * To get the specific event
+     * If the user doesn't login the event view will not be incremented
+     *
+     * @param id event id
+     * @return Event object
+     * @throws EventNotFoundException if the event is not found
+     */
+    public EventResponse getEventById(long id){
+        Events event =  eventRepo.findById(id).orElseThrow(() -> new EventNotFoundException("Event not Found"));
+        return EventMapper.toResponse(event);
+    }
+
+    /**
+     * To update event
+     *
+     * @param id event it
+     * @param request contain details to update the event
+     * @return the updated event
+     * @throws EventNotFoundException if the event is not found
+     */
     public EventResponse updateEvent(long id,EventRegisterRequest request){
         Events events = eventRepo.findById(id).orElseThrow(
                 () -> new EventNotFoundException("To update the event, the give id is invalid")
@@ -117,7 +172,12 @@ public class EventService {
         return EventMapper.toResponse(events);
     }
 
-    @Transactional
+    /**
+     * To delete the event
+     *
+     * @param id event id
+     * @throws EventNotFoundException if the event is not found
+     */
     public void deleteEventById(long id){
         Events events = eventRepo.findById(id).orElseThrow(
                 ()->new EventNotFoundException("Invalid event to delete")
@@ -138,7 +198,13 @@ public class EventService {
                 .toList();
     }
 
-    @Transactional
+    /**
+     * to register for specific event
+     * @param id event id
+     * @param email user email
+     * @throws EventNotFoundException if the event is not found
+     * @throws UserNotFoundException if the user not found
+     */
     public void registerEvent(long id,String email) {
 
         if(email == null){
