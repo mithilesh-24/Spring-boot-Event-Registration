@@ -38,7 +38,13 @@ public class EventService {
        Events events = new Events();
        LocalDate today = LocalDate.now();
 
-        eventRepo.findByEventName(request.getEventName()).ifPresent(
+        States state = stateRepo.findByStateName(request.getStateName()).orElseGet(()-> {
+            States newstates = new States();
+            newstates.setStateName(request.getStateName());
+            return stateRepo.save(newstates);
+        });
+
+        eventRepo.findByEventName(request.getEventName(),state.getStateId()).ifPresent(
                 e -> {
                     throw new EventAlreadyExist("Event Already Exist");
                 });
@@ -49,11 +55,6 @@ public class EventService {
         if(request.getRegistrationEndDate().isBefore(today.plusDays(5)))
             throw new EventDateException("Registration end date must be at least 5 from today");
 
-        States state = stateRepo.findByStateName(request.getStateName()).orElseGet(()-> {
-            States newstates = new States();
-            newstates.setStateName(request.getStateName());
-            return stateRepo.save(newstates);
-        });
 
         events.setEventName(request.getEventName());
         events.setDescription(request.getDescription());
@@ -189,6 +190,7 @@ public class EventService {
 
         eventRepo.delete(events);
     }
+
 
     public List<?> getEventsBySearch(String eventName) {
 

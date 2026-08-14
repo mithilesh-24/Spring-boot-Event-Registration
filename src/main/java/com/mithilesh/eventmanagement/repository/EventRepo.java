@@ -19,11 +19,11 @@ public interface EventRepo extends JpaRepository<Events,Long> {
         from Events e
         where replace(lower(e.eventName),' ','') =
             replace (lower(:eventName),' ','' )
+                 AND e.state.stateId = :stateId
     """)
-    Optional<Events> findByEventName( String eventName);
+    Optional<Events> findByEventName(String eventName,long stateId);
 
 
-    //check this spring data jpa, write without query..
     @Query("""
         SELECT e
         FROM Events e
@@ -32,10 +32,10 @@ public interface EventRepo extends JpaRepository<Events,Long> {
         ORDER BY
             e.state.stateName,
             CASE WHEN f.favoritesId = NULL THEN 0 ELSE 1 END DESC,
+            e.eventName,
             e.popularityScores DESC
 """)
     List<Events> findSortedEvent(String email);
 
 
-    List<Events> findByFavUsers_User_EmailOrderByState_StateNameAscEventNameAsc(String email);
 }
