@@ -50,7 +50,7 @@ public class FavoritesService {
 
         Events events = eventRepo.findById(id).orElseThrow(() -> new EventNotFoundException("Invalid event ID"));
 
-        if(favoriteRepo.findByEvent_EventId(events.getEventId()).isPresent()){
+        if(favoriteRepo.findByUser_EmailAndEvent_EventId(email,events.getEventId()).isPresent()){
             throw new EventAlreadyExist("This event is already in favorites");
         }
         Favorites favorites = new Favorites();

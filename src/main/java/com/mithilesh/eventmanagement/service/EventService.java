@@ -134,7 +134,7 @@ public class EventService {
 
     /**
      * To get the specific event
-     * If the user doesn't login the event view will not be incremented
+     * If the user doesn't log in the event view will not be incremented
      *
      * @param id event id
      * @return Event object
