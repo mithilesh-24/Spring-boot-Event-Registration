@@ -29,6 +29,7 @@ public class EventService {
     final private UserRepo userRepo;
     final private EventViewsRepo eventViewsRepo;
     final private FavoriteRepo favoriteRepo;
+    final private CovidAffectedAreaRepo covidAffectedAreaRepo;
 
     /**
      * To create event
@@ -293,6 +294,21 @@ public class EventService {
                             )
 
             );
+        }
+        if(searchRequest.isHideCovid()){
+            List<Long> stateList = covidAffectedAreaRepo.findAll()
+                    .stream()
+                    .map(CovidAffectedArea::getStates)
+                    .map(States::getStateId)
+                    .toList();
+
+            spec = spec.and(
+                        (root, query, cb) ->
+                            cb.not(
+                                    root.get("states")
+                                            .get("stateId").in(stateList)
+                            )
+                    );
         }
 
         return eventRepo.findAll(spec)

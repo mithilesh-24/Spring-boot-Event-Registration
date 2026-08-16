@@ -15,5 +15,5 @@ public class SearchRequest {
     private String description;
     private String venue;
     private String query;
-    private String hideCovid;
+    private boolean hideCovid;
 }
