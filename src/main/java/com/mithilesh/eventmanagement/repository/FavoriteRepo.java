@@ -17,6 +17,5 @@ public interface FavoriteRepo extends JpaRepository<Favorites,Long> {
 
     void deleteByEvent(Events events);
 
-    //see this
-    //List<Favorites> findByUser_EmailOrderByEvent(String userEmail);
+    Optional<Favorites> findByEvent_EventId(long eventId);
 }

@@ -15,6 +15,12 @@ import org.springframework.web.bind.annotation.*;
 public class FavoriteController {
 
     private final FavoritesService favoritesService;
+    /**
+     * to get the list of favorites events
+     *
+     * @param userPrincipal contains the user data
+     * @return list of favorites
+     */
     @GetMapping
     public ResponseEntity<?> getFavorites(@AuthenticationPrincipal UserPrincipal userPrincipal){
 
@@ -27,6 +33,13 @@ public class FavoriteController {
         );
     }
 
+    /**
+     * add favorite event
+     *
+     * @param userPrincipal contains user data
+     * @param id eventId
+     * @return success message
+     */
     @PostMapping("/{id}")
     public ResponseEntity<?> addFavorites(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable long id){
 
@@ -34,12 +47,18 @@ public class FavoriteController {
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 new ApiResponse<>(
                         201,
-                        "Successfully added",
-                        null
+                        "Successfully added"
                 )
         );
     }
 
+    /**
+     * to remove favorites event
+     *
+     * @param userPrincipal contains user data
+     * @param id eventId
+     * @return successful message
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteFavorites(@AuthenticationPrincipal UserPrincipal userPrincipal,@PathVariable long id){
         favoritesService.deleteFavorites(userPrincipal.getUsername(),id);
@@ -47,8 +66,7 @@ public class FavoriteController {
         return ResponseEntity.ok(
                 new ApiResponse<>(
                         204,
-                        "Deleted Successfully",
-                        null
+                        "Deleted Successfully"
                 )
         );
     }
