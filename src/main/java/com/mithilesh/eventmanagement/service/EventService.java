@@ -2,6 +2,7 @@ package com.mithilesh.eventmanagement.service;
 
 
 import com.mithilesh.eventmanagement.dto.Request.EventRegisterRequest;
+import com.mithilesh.eventmanagement.dto.Request.SearchRequest;
 import com.mithilesh.eventmanagement.dto.Response.EventResponse;
 import com.mithilesh.eventmanagement.entity.*;
 import com.mithilesh.eventmanagement.exception.EventAlreadyExist;
@@ -12,9 +13,12 @@ import com.mithilesh.eventmanagement.mapper.EventMapper;
 import com.mithilesh.eventmanagement.repository.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -76,10 +80,9 @@ public class EventService {
      * @return list of event as Response object
      */
     public List<EventResponse> getEvents() {
-        return eventRepo.findAll()
+        return eventRepo.findAllByOrderByEventNameAsc()
                 .stream()
                 .map(EventMapper::toResponse)
-                .sorted((a, b) -> a.getEventName().compareTo(b.getEventName()))
                 .toList();
     }
 
@@ -192,11 +195,109 @@ public class EventService {
     }
 
 
-    public List<?> getEventsBySearch(String eventName) {
+    /**
+     * To search and filter the event
+     *
+     *
+     * @param searchRequest contain details to search and filter
+     * @return list of events
+     */
+    public List<?> getEventsBySearch(SearchRequest searchRequest) {
 
-        return eventRepo.findByEventNameContainingIgnoreCase(eventName)
+        Specification<Events> spec = Specification.unrestricted();
+
+        if(searchRequest.getEventName() != null){
+            spec = spec.and(
+                    (root, query, cb) ->
+                        cb.like(
+                                root.get("eventName"),
+                                "%" +searchRequest.getEventName()+ "%"
+                        )
+            );
+        }
+        if(searchRequest.getDescription() != null){
+            spec = spec.and(
+                    (root, query, cb) ->
+                            cb.like(root.get("description"),
+                            "%" + searchRequest.getDescription() + "%"
+                            )
+            );
+        }
+        if(searchRequest.getStateName() != null){
+            Optional<States> state = stateRepo.findByStateName(searchRequest.getStateName());
+
+            if(state.isPresent()) {
+                spec = spec.and(
+                        (root, query, cb) ->
+                                cb.equal(root.get("stateId"),
+                                        state.get().getStateId()
+                                )
+                );
+            }
+        }
+        if(searchRequest.getStartDate() != null && searchRequest.getEndDate() != null){
+            spec = spec.and(
+                    (root, query, cb) ->
+                            cb.between(
+                                    root.get("eventDate"),
+                                    searchRequest.getStartDate(),
+                                    searchRequest.getEndDate()
+                            )
+            );
+        }
+        else if(searchRequest.getEndDate()!= null){
+            spec = spec.and(
+                    (root, query, cb) ->
+                        cb.lessThanOrEqualTo(
+                                root.get("eventDate"),
+                                searchRequest.getEndDate()
+                        )
+            );
+        }
+        else if(searchRequest.getStartDate() != null){
+            spec = spec.and(
+                    (root, query, cb) ->
+                        cb.greaterThanOrEqualTo(
+                                root.get("eventDate"),
+                                searchRequest.getStartDate()
+                        )
+            );
+        }
+        if(searchRequest.getRegistrationEndDate() != null){
+            spec = spec.and(
+                    (root, query, cb) ->
+                        cb.equal(
+                                root.get("registrationEndDate"),
+                                searchRequest.getRegistrationEndDate()
+                        )
+            );
+        }
+        if(searchRequest.getQuery() != null &&
+                !searchRequest.getQuery().isBlank()){
+            String searchString = "%" +  searchRequest.getQuery().toLowerCase() + "%";
+            spec = spec.and(
+                    (root, query, cb) ->
+                            cb.or(
+                                cb.like(
+                                    root.get("eventName"),
+                                    searchString
+                                ),
+                                cb.like(
+                                        root.get("description"),
+                                        searchString
+                                ),
+                                cb.like(
+                                        root.get("venue"),
+                                        searchString
+                                )
+                            )
+
+            );
+        }
+
+        return eventRepo.findAll(spec)
                 .stream()
-                .map(events -> EventMapper.toResponse(events))
+                .map(EventMapper::toResponse)
                 .toList();
     }
 

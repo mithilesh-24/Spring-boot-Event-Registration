@@ -1,6 +1,7 @@
 package com.mithilesh.eventmanagement.controller;
 
 
+import com.mithilesh.eventmanagement.dto.Request.SearchRequest;
 import com.mithilesh.eventmanagement.dto.Response.ApiResponse;
 import com.mithilesh.eventmanagement.dto.Request.EventRegisterRequest;
 import com.mithilesh.eventmanagement.dto.Response.EventResponse;
@@ -141,17 +142,17 @@ public class EventController {
     /**
      * To search the event
      *
-     * @param eventName to search
+     * @param  search object contain details to search
      * @return List of event similar to event name
      */
     @GetMapping("/search")
-    public ResponseEntity<?> searchEvent(@RequestParam String eventName){
+    public ResponseEntity<?> searchEvent(@RequestParam SearchRequest search){
 
         return ResponseEntity.ok().body(
                 new ApiResponse<>(
                         200,
                         "Search result",
-                        service.getEventsBySearch(eventName)
+                        service.getEventsBySearch(search)
                 )
         );
     }
