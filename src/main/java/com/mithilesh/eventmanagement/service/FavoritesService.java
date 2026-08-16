@@ -5,6 +5,7 @@ import com.mithilesh.eventmanagement.dto.Response.EventResponse;
 import com.mithilesh.eventmanagement.entity.Events;
 import com.mithilesh.eventmanagement.entity.Favorites;
 import com.mithilesh.eventmanagement.entity.Users;
+import com.mithilesh.eventmanagement.exception.EventAlreadyExist;
 import com.mithilesh.eventmanagement.exception.EventNotFoundException;
 import com.mithilesh.eventmanagement.exception.UserNotFoundException;
 import com.mithilesh.eventmanagement.mapper.EventMapper;
@@ -24,6 +25,12 @@ public class FavoritesService {
     private final FavoriteRepo favoriteRepo;
     private final EventRepo eventRepo;
 
+    /**
+     * to get list of favorite event
+     *
+     * @param email user email
+     * @return list of favorites event
+     */
     public List<EventResponse> getFavorites(String email){
         return favoriteRepo.findAllByUser_Email(email)
                 .stream()
@@ -32,12 +39,20 @@ public class FavoritesService {
                 .toList();
     }
 
-    @Transactional
+    /**
+     * To add event to user
+     *
+     * @param email user email
+     * @param id event to add
+     */
     public void addFavorites(String email,long id) {
         Users users = userRepo.findByEmail(email).orElseThrow(() -> new UserNotFoundException("Invalid email"));
 
         Events events = eventRepo.findById(id).orElseThrow(() -> new EventNotFoundException("Invalid event ID"));
 
+        if(favoriteRepo.findByUser_EmailAndEvent_EventId(email,events.getEventId()).isPresent()){
+            throw new EventAlreadyExist("This event is already in favorites");
+        }
         Favorites favorites = new Favorites();
         favorites.setEvent(events);
         favorites.setUser(users);
@@ -45,7 +60,12 @@ public class FavoritesService {
         favoriteRepo.save(favorites);
     }
 
-    @Transactional
+    /**
+     * to delete a favorite event
+     *
+     * @param email user email
+     * @param id event to delete
+     */
     public void deleteFavorites(String email, long id) {
 
         Favorites favorites = favoriteRepo
