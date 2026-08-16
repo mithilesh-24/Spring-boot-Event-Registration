@@ -2,6 +2,7 @@ package com.mithilesh.eventmanagement.repository;
 
 import com.mithilesh.eventmanagement.entity.Events;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -10,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface EventRepo extends JpaRepository<Events,Long> {
+public interface EventRepo extends JpaRepository<Events,Long>, JpaSpecificationExecutor<Events> {
 
     List<Events> findByEventNameContainingIgnoreCase(String name);
 
@@ -19,11 +20,11 @@ public interface EventRepo extends JpaRepository<Events,Long> {
         from Events e
         where replace(lower(e.eventName),' ','') =
             replace (lower(:eventName),' ','' )
+                 AND e.state.stateId = :stateId
     """)
-    Optional<Events> findByEventName( String eventName);
+    Optional<Events> findByEventName(String eventName,long stateId);
 
 
-    //check this spring data jpa, write without query..
     @Query("""
         SELECT e
         FROM Events e
@@ -32,10 +33,10 @@ public interface EventRepo extends JpaRepository<Events,Long> {
         ORDER BY
             e.state.stateName,
             CASE WHEN f.favoritesId = NULL THEN 0 ELSE 1 END DESC,
+            e.eventName,
             e.popularityScores DESC
 """)
     List<Events> findSortedEvent(String email);
 
-
-    List<Events> findByFavUsers_User_EmailOrderByState_StateNameAscEventNameAsc(String email);
+    List<Events> findAllByOrderByEventNameAsc();
 }

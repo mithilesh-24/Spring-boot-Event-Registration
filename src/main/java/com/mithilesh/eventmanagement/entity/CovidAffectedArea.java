@@ -1,28 +1,24 @@
 package com.mithilesh.eventmanagement.entity;
 
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Generated;
 import lombok.NoArgsConstructor;
-import java.util.List;
 
 @Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "states")
-public class States {
+@Table(name = "covid_affected_areas")
+public class CovidAffectedArea {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long stateId;
+    private long id;
 
-    private String stateName;
+    @OneToOne
+    @JoinColumn(name = "state_id")
+    private States states;
 
-    @OneToMany(mappedBy = "state")
-    private List<Events> events;
-
-    @OneToOne(mappedBy = "states")
-    private CovidAffectedArea covidAffectedArea;
 }

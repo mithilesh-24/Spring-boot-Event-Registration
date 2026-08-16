@@ -31,24 +31,34 @@ public class GlobalExceptionHandler {
         );
     }
 
+    /**
+     * When Event is Not found it is thrown
+     *
+     * @param ex Exception object
+     * @return Not Found Status as response
+     */
     @ExceptionHandler(EventNotFoundException.class)
     public ResponseEntity<?> handeEventNotFound(EventNotFoundException ex){
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
                 new ApiResponse<>(
-                        404,
-                        ex.getMessage(),
-                        null
+                        HttpStatus.NOT_FOUND.value(),
+                        ex.getMessage()
                 )
         );
     }
 
+    /**
+     * When the date is invalid
+     *
+     * @param ex Exception object
+     * @return Bad Request as response object
+     */
     @ExceptionHandler(EventDateException.class)
     public ResponseEntity<?> handleEventDate(EventDateException ex){
         return ResponseEntity.badRequest().body(
                 new ApiResponse<>(
-                        404,
-                        ex.getMessage(),
-                        null
+                        HttpStatus.BAD_REQUEST.value(),
+                        ex.getMessage()
                 )
         );
     }
@@ -70,17 +80,29 @@ public class GlobalExceptionHandler {
     }
 
 
+    /**
+     * The event is already existed
+     *
+     * @param ex Exception object
+     * @return Conflict code as response
+     */
     @ExceptionHandler(EventAlreadyExist.class)
     public ResponseEntity<?> handleEventAlreadyExist(EventAlreadyExist ex){
-        return ResponseEntity.badRequest().body(
+        return ResponseEntity.status(HttpStatus.CONFLICT.value()).body(
                 new ApiResponse<>(
-                        400,
+                        HttpStatus.CONFLICT.value(),
                         ex.getMessage(),
                         null
                 )
         );
     }
 
+    /**
+     * Validation Exception
+     *
+     * @param ex Exception
+     * @return BadRequest as Abject
+     */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<?> handleNotValidation(MethodArgumentNotValidException ex){
 

@@ -1,5 +1,5 @@
 $kind: http-request
 name: View Event
-url: "{{base}}/api/event"
+url: http://localhost:8090/api/event
 method: GET
 order: 4458536900229300
