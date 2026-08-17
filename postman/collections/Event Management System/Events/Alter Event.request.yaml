@@ -1,7 +1,7 @@
 $kind: http-request
 name: Alter Event
 url: "{{base}}/api/event/{{eventId}}"
-method: GET
+method: PUT
 auth:
   type: bearer
 order: 4169500149057947

@@ -43,7 +43,7 @@ public class EventService {
        Events events = new Events();
        LocalDate today = LocalDate.now();
 
-        States state = stateRepo.findByStateName(request.getStateName()).orElseGet(()-> {
+        States state = stateRepo.findByStateNameIgnoreCase(request.getStateName()).orElseGet(()-> {
             States newstates = new States();
             newstates.setStateName(request.getStateName());
             return stateRepo.save(newstates);
@@ -158,7 +158,7 @@ public class EventService {
                 () -> new EventNotFoundException("To update the event, the give id is invalid")
         );
 
-        States states = stateRepo.findByStateName(request.getStateName()).orElseGet(()-> {
+        States states = stateRepo.findByStateNameIgnoreCase(request.getStateName()).orElseGet(()-> {
             States newstates = new States();
             newstates.setStateName(request.getStateName());
             return stateRepo.save(newstates);
@@ -183,6 +183,7 @@ public class EventService {
      * @param id event id
      * @throws EventNotFoundException if the event is not found
      */
+    @Transactional
     public void deleteEventById(long id){
         Events events = eventRepo.findById(id).orElseThrow(
                 ()->new EventNotFoundException("Invalid event to delete")
@@ -211,8 +212,8 @@ public class EventService {
             spec = spec.and(
                     (root, query, cb) ->
                         cb.like(
-                                root.get("eventName"),
-                                "%" +searchRequest.getEventName()+ "%"
+                                cb.lower(root.get("eventName")),
+                                "%" +searchRequest.getEventName().toLowerCase()+ "%"
                         )
             );
         }
@@ -225,7 +226,7 @@ public class EventService {
             );
         }
         if(searchRequest.getStateName() != null){
-            Optional<States> state = stateRepo.findByStateName(searchRequest.getStateName());
+            Optional<States> state = stateRepo.findByStateNameIgnoreCase(searchRequest.getStateName());
 
             if(state.isPresent()) {
                 spec = spec.and(
@@ -280,15 +281,15 @@ public class EventService {
                     (root, query, cb) ->
                             cb.or(
                                 cb.like(
-                                    root.get("eventName"),
+                                    cb.lower(root.get("eventName")),
                                     searchString
                                 ),
                                 cb.like(
-                                        root.get("description"),
+                                        cb.lower(root.get("description")),
                                         searchString
                                 ),
                                 cb.like(
-                                        root.get("venue"),
+                                        cb.lower(root.get("venue")),
                                         searchString
                                 )
                             )

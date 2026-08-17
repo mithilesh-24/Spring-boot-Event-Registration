@@ -40,22 +40,24 @@ public class ConfigSecurity {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(req -> req
                         .requestMatchers("/auth/**",
-                                "/event",
+                                "/event/search",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
                                 "/swagger-ui.html"
                         ).permitAll()
 
                         .requestMatchers(HttpMethod.GET,
-                                "/event/register/{id}",
-                                "/event/search",
+                                "/event",
                                 "/event/{id}"
-                        ).hasAnyRole("USER","ADMIN")
+                                ).permitAll()
+                        .requestMatchers(HttpMethod.GET,
+                                "/event/{id}/registrations"
+                        ).hasAnyRole("USER")
 
                         .requestMatchers(HttpMethod.DELETE,
                                 "/event/{id}").hasRole("ADMIN")
 
-                        .requestMatchers(HttpMethod.POST,"/event/create").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST,"/event").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT,"/event/{id}").hasRole("ADMIN")
 
                         .requestMatchers("/favorites/**").hasRole("USER")
