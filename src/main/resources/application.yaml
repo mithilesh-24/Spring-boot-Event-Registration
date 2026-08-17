@@ -2,8 +2,16 @@ spring:
   application:
     name: EventManagement
   datasource:
-    username: root
-    password: 123456
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    url: ${DB_URL}
+  jpa:
+    show-sql: true
 
 server:
   port: 8090
+  servlet:
+    context-path: /api
+
+jwt:
+  secret: ${JWT_SECRET}

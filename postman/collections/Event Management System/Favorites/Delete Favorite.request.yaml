@@ -1,0 +1,5 @@
+$kind: http-request
+name: Delete Favorite
+url: "{{base}}/api/favorites/{{id}}"
+method: DELETE
+order: 2105373664740762
