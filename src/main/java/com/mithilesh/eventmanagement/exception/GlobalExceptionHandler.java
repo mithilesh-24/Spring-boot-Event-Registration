@@ -4,6 +4,7 @@ import com.mithilesh.eventmanagement.dto.Response.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -135,5 +136,22 @@ public class GlobalExceptionHandler {
                         "User Already existed"
                 )
         );
+    }
+
+    /**
+     * When the password is invalid it is thrown
+     *
+     * @param ex Exception
+     * @return unauthorized as response
+     */
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<?> handleBadCredentials(BadCredentialsException ex) {
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED).body(
+                        new ApiResponse<>(
+                                HttpStatus.UNAUTHORIZED.value(),
+                                "Invalid email or password"
+                        )
+                );
     }
 }

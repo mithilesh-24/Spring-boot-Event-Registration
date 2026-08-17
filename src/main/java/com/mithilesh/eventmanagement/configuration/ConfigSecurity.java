@@ -29,9 +29,10 @@ public class ConfigSecurity {
     private final JwtFilter jwtFilter;
 
     /**
+     * Configure the Http security rules, public endpoint, authorization and jwt authentication.
      *
-     * @param http
-     * @return 
+     * @param http contains http Security configuration
+     * @return the configured security http filter chain
      */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http){
@@ -60,7 +61,10 @@ public class ConfigSecurity {
                         .requestMatchers(HttpMethod.POST,"/event").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT,"/event/{id}").hasRole("ADMIN")
 
-                        .requestMatchers("/favorites/**").hasRole("USER")
+                        .requestMatchers(
+                                "/favorites/**",
+                                "/api/favorites"
+                        ).hasRole("USER")
 
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -68,11 +72,22 @@ public class ConfigSecurity {
                 .build();
     }
 
+    /**
+     * To create Password encoder
+     * Used to store it on the DB in encoded form
+     *
+     * @return the password encoder to encode the password
+     */
     @Bean
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder(12);
     }
 
+    /**
+     * To control the log in logic
+     *
+     * @return the AuthenticationProvider
+     */
     @Bean
     public AuthenticationProvider authenticationProvider(){
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider(myUserDetailService);
@@ -80,6 +95,12 @@ public class ConfigSecurity {
         return provider;
     }
 
+    /**
+     * To manage the authentication
+     *
+     * @param config contains the Authentication configuration
+     * @return the AuthenticationManager
+     */
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config){
         return config.getAuthenticationManager();

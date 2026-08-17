@@ -1,5 +1,7 @@
 package com.mithilesh.eventmanagement.security;
 
+import com.mithilesh.eventmanagement.entity.BlacklistedTokens;
+import com.mithilesh.eventmanagement.service.BlacklistedTokensService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,6 +23,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private final MyUserDetailService myUserDetailService;
     private final JwtService jwtService;
+    private final BlacklistedTokensService blacklistedTokensService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -30,6 +33,11 @@ public class JwtFilter extends OncePerRequestFilter {
 
         if(authHeader != null && authHeader.startsWith("Bearer ")){
             token = authHeader.substring(7);
+
+            if(blacklistedTokensService.isBlacklisted(token)) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                return;
+            }
             email = jwtService.extractEmail(token);
         }
 

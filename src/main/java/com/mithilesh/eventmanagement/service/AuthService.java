@@ -23,7 +23,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
-
+    private final BlacklistedTokensService blacklistedTokensService;
     /**
      * To save the user in DB
      *
@@ -62,5 +62,15 @@ public class AuthService {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(dto.getEmail(),dto.getPassword()));
 
         return jwtService.generateKey(dto.getEmail());
+    }
+
+    /**
+     * handover the token blacklist to the Blacklist Service
+     *
+     * @param authorization contain the authorization header
+     */
+    public void logout(String authorization) {
+        String token = authorization.substring(7);
+        blacklistedTokensService.addBlackList(token);
     }
 }
