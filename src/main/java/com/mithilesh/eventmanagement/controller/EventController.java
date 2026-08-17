@@ -130,13 +130,7 @@ public class EventController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteEvent(@PathVariable long id){
         service.deleteEventById(id);
-        return ResponseEntity.ok(
-                new ApiResponse<>(
-                        204,
-                        "Event is Deleted",
-                        null
-                )
-        );
+        return ResponseEntity.noContent().build();
     }
 
     /**
@@ -146,7 +140,7 @@ public class EventController {
      * @return List of event similar to event name
      */
     @GetMapping("/search")
-    public ResponseEntity<?> searchEvent(@RequestParam SearchRequest search){
+    public ResponseEntity<?> searchEvent(@ModelAttribute SearchRequest search){
 
         return ResponseEntity.ok().body(
                 new ApiResponse<>(
@@ -164,7 +158,7 @@ public class EventController {
      * @param userPrincipal contains email and password
      * @return success message
      */
-    @PostMapping("/{id}")
+    @PostMapping("/{id}/registrations")
     public ResponseEntity<?> registerEvent(@PathVariable long id, @AuthenticationPrincipal UserPrincipal userPrincipal){
 
         service.registerEvent(id,userPrincipal.getUsername());

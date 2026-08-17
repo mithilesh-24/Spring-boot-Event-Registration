@@ -1,5 +1,0 @@
-$kind: http-request
-name: New Request
-url: "{{base}}/api/event/{{eventId}}"
-method: DELETE
-order: 4447635487814874

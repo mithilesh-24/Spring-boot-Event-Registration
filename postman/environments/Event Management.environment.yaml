@@ -4,3 +4,7 @@ values:
     value: ''
   - key: base
     value: ''
+  - key: jwt
+    value: ''
+  - key: id
+    value: ''
