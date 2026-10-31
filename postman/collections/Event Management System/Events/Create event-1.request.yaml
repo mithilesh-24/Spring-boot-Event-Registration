@@ -1,0 +1,24 @@
+$kind: http-request
+name: Create event
+url: "{{base}}}/api/event"
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \  \"eventName\": \"\",\r
+
+    \  \"stateName\": \"\",\r
+
+    \  \"eventDate\": \"\",\r
+
+    \  \"registrationEndDate\": \"\",\r
+
+    \  \"description\": \"\",\r
+
+    \  \"venue\": \"\"\r
+
+    }"
+auth:
+  type: bearer
+order: 3192088281802239

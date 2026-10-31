@@ -1,0 +1,10 @@
+name: Event Management
+values:
+  - key: eventId
+    value: ''
+  - key: base
+    value: ''
+  - key: jwt
+    value: ''
+  - key: id
+    value: ''
