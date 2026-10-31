@@ -32,7 +32,7 @@ public class AuthService {
      * @throws AgeRestrictionException if the age is less than 18
      */
     public void register(SignupRequest dto){
-
+        
         if(userRepo.findByEmail(dto.getEmail()).isPresent()){
             throw new UserAlreadyExistsException("The user is already existed");
         }

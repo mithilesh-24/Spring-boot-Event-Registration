@@ -11,14 +11,16 @@ import com.mithilesh.eventmanagement.exception.EventNotFoundException;
 import com.mithilesh.eventmanagement.exception.UserNotFoundException;
 import com.mithilesh.eventmanagement.mapper.EventMapper;
 import com.mithilesh.eventmanagement.repository.*;
+import com.mithilesh.eventmanagement.specification.EventSpecification;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -29,7 +31,8 @@ public class EventService {
     final private UserRepo userRepo;
     final private EventViewsRepo eventViewsRepo;
     final private FavoriteRepo favoriteRepo;
-    final private CovidAffectedAreaRepo covidAffectedAreaRepo;
+    final private EventSpecification eventSpecification;
+
 
     /**
      * To create event
@@ -140,6 +143,7 @@ public class EventService {
      * @return Event object
      * @throws EventNotFoundException if the event is not found
      */
+    @Cacheable("Event")
     public EventResponse getEventById(long id){
         Events event =  eventRepo.findById(id).orElseThrow(() -> new EventNotFoundException("Event not Found"));
         return EventMapper.toResponse(event);
@@ -196,7 +200,6 @@ public class EventService {
         eventRepo.delete(events);
     }
 
-
     /**
      * To search and filter the event
      *
@@ -206,117 +209,21 @@ public class EventService {
      */
     public List<?> getEventsBySearch(SearchRequest searchRequest) {
 
-        Specification<Events> spec = Specification.unrestricted();
-
-        if(searchRequest.getEventName() != null){
-            spec = spec.and(
-                    (root, query, cb) ->
-                        cb.like(
-                                cb.lower(root.get("eventName")),
-                                "%" +searchRequest.getEventName().toLowerCase()+ "%"
-                        )
-            );
-        }
-        if(searchRequest.getDescription() != null){
-            spec = spec.and(
-                    (root, query, cb) ->
-                            cb.like(root.get("description"),
-                            "%" + searchRequest.getDescription() + "%"
-                            )
-            );
-        }
-        if(searchRequest.getStateName() != null){
-            Optional<States> state = stateRepo.findByStateNameIgnoreCase(searchRequest.getStateName());
-
-            if(state.isPresent()) {
-                spec = spec.and(
-                        (root, query, cb) ->
-                                cb.equal(root.get("stateId"),
-                                        state.get().getStateId()
-                                )
-                );
-            }
-        }
-        if(searchRequest.getStartDate() != null && searchRequest.getEndDate() != null){
-            spec = spec.and(
-                    (root, query, cb) ->
-                            cb.between(
-                                    root.get("eventDate"),
-                                    searchRequest.getStartDate(),
-                                    searchRequest.getEndDate()
-                            )
-            );
-        }
-        else if(searchRequest.getEndDate()!= null){
-            spec = spec.and(
-                    (root, query, cb) ->
-                        cb.lessThanOrEqualTo(
-                                root.get("eventDate"),
-                                searchRequest.getEndDate()
-                        )
-            );
-        }
-        else if(searchRequest.getStartDate() != null){
-            spec = spec.and(
-                    (root, query, cb) ->
-                        cb.greaterThanOrEqualTo(
-                                root.get("eventDate"),
-                                searchRequest.getStartDate()
-                        )
-            );
-        }
-        if(searchRequest.getRegistrationEndDate() != null){
-            spec = spec.and(
-                    (root, query, cb) ->
-                        cb.equal(
-                                root.get("registrationEndDate"),
-                                searchRequest.getRegistrationEndDate()
-                        )
-            );
-        }
-        if(searchRequest.getQuery() != null &&
-                !searchRequest.getQuery().isBlank()){
-            String searchString = "%" +  searchRequest.getQuery().toLowerCase() + "%";
-            spec = spec.and(
-                    (root, query, cb) ->
-                            cb.or(
-                                cb.like(
-                                    cb.lower(root.get("eventName")),
-                                    searchString
-                                ),
-                                cb.like(
-                                        cb.lower(root.get("description")),
-                                        searchString
-                                ),
-                                cb.like(
-                                        cb.lower(root.get("venue")),
-                                        searchString
-                                )
-                            )
-
-            );
-        }
-        if(searchRequest.isHideCovid()){
-            List<Long> stateList = covidAffectedAreaRepo.findAll()
-                    .stream()
-                    .map(CovidAffectedArea::getStates)
-                    .map(States::getStateId)
-                    .toList();
-
-            spec = spec.and(
-                        (root, query, cb) ->
-                            cb.not(
-                                    root.get("states")
-                                            .get("stateId").in(stateList)
-                            )
-                    );
-        }
+        Specification<Events> spec = (root, query, cb) -> cb.conjunction();
+        spec = spec.and(eventSpecification.hasEventName(searchRequest.getEventName()))
+                .and(eventSpecification.hasDescription(searchRequest.getDescription()))
+                .and(eventSpecification.hasStateName(searchRequest.getStateName()))
+                .and(eventSpecification.withinDateRange(searchRequest.getStartDate(),searchRequest.getEndDate()))
+                .and(eventSpecification.searchQuery(searchRequest.getQuery()))
+                .and(eventSpecification.hasRegistrationEndDate(searchRequest.getRegistrationEndDate()))
+                .and(eventSpecification.hideCovid(searchRequest.isHideCovid()));
 
         return eventRepo.findAll(spec)
                 .stream()
                 .map(EventMapper::toResponse)
                 .toList();
     }
+
 
     /**
      * to register for specific event
