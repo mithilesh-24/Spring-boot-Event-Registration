@@ -5,6 +5,7 @@ import com.mithilesh.eventmanagement.security.JwtFilter;
 import com.mithilesh.eventmanagement.security.MyUserDetailService;
 import com.sun.net.httpserver.HttpsConfigurator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -23,6 +24,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
+@EnableCaching
 public class ConfigSecurity {
 
     private final MyUserDetailService myUserDetailService;
