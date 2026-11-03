@@ -4,10 +4,12 @@ import com.mithilesh.eventmanagement.entity.BlacklistedTokens;
 import com.mithilesh.eventmanagement.repository.BlacklistedTokensRepo;
 import com.mithilesh.eventmanagement.security.JwtService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BlacklistedTokensService {
@@ -20,6 +22,7 @@ public class BlacklistedTokensService {
      * @param token jwt token
      */
     public void addBlackList(String token){
+        log.debug("Add token to the blacklist");
         Instant expireAt = jwtService.extractExpiration(token).toInstant();
 
         BlacklistedTokens blacklistedTokens = new BlacklistedTokens();
@@ -27,14 +30,11 @@ public class BlacklistedTokensService {
         blacklistedTokens.setToken(token);
 
         blacklistedTokensRepo.save(blacklistedTokens);
+        log.debug("Token added to blacklist");
     }
 
     public boolean isBlacklisted(String token){
-
+        log.debug("check Token is Blacklisted or not");
         return blacklistedTokensRepo.existsByToken(token);
-    }
-
-    public void cleanUp(){
-        blacklistedTokensRepo.deleteByExpireAtBefore(Instant.now());
     }
 }

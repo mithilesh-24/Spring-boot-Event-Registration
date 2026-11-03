@@ -8,6 +8,7 @@ import com.mithilesh.eventmanagement.exception.UserAlreadyExistsException;
 import com.mithilesh.eventmanagement.repository.UserRepo;
 import com.mithilesh.eventmanagement.security.JwtService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,6 +19,7 @@ import java.time.Period;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthService {
     private final UserRepo userRepo;
     private final PasswordEncoder passwordEncoder;
@@ -32,7 +34,8 @@ public class AuthService {
      * @throws AgeRestrictionException if the age is less than 18
      */
     public void register(SignupRequest dto){
-        
+
+        log.debug("User Registration Started");
         if(userRepo.findByEmail(dto.getEmail()).isPresent()){
             throw new UserAlreadyExistsException("The user is already existed");
         }
@@ -49,6 +52,7 @@ public class AuthService {
         users.setEmail(dto.getEmail());
 
         userRepo.save(users);
+        log.debug("User Registration Completed");
     }
 
     /**
@@ -59,8 +63,10 @@ public class AuthService {
      * @throws com.mithilesh.eventmanagement.exception.InvalidUserPasswordException if is the email or password were not correct
      */
     public String login(LoginRequest dto){
+        log.debug("Authenticating User");
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(dto.getEmail(),dto.getPassword()));
 
+        log.debug("Authentication completed");
         return jwtService.generateKey(dto.getEmail());
     }
 
@@ -70,7 +76,10 @@ public class AuthService {
      * @param authorization contain the authorization header
      */
     public void logout(String authorization) {
+
+        log.debug("User Logout Request Processing");
         String token = authorization.substring(7);
         blacklistedTokensService.addBlackList(token);
+        log.debug("Logout Successful");
     }
 }

@@ -24,7 +24,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-@EnableCaching
 public class ConfigSecurity {
 
     private final MyUserDetailService myUserDetailService;
@@ -46,7 +45,9 @@ public class ConfigSecurity {
                                 "/event/search",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
-                                "/swagger-ui.html"
+                                "/swagger-ui.html",
+                                "/actuator/**",
+                                "/v3/api-docs"
                         ).permitAll()
 
                         .requestMatchers(HttpMethod.GET,

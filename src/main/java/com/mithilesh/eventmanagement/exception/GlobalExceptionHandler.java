@@ -1,6 +1,7 @@
 package com.mithilesh.eventmanagement.exception;
 
 import com.mithilesh.eventmanagement.dto.Response.ApiResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
 
     /**
@@ -24,6 +26,8 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(AgeRestrictionException.class)
     public ResponseEntity<?> handleAgeRestriction(AgeRestrictionException ex) {
+
+        log.warn("Age restriction failed: {}", ex.getMessage());
         return ResponseEntity.badRequest().body(
                 new ApiResponse<>(
                         HttpStatus.BAD_REQUEST.value(),
@@ -40,6 +44,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(EventNotFoundException.class)
     public ResponseEntity<?> handeEventNotFound(EventNotFoundException ex){
+        log.warn("Event not found: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
                 new ApiResponse<>(
                         HttpStatus.NOT_FOUND.value(),
@@ -56,6 +61,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(EventDateException.class)
     public ResponseEntity<?> handleEventDate(EventDateException ex){
+        log.warn("Invalid event Date: {}", ex.getMessage());
         return ResponseEntity.badRequest().body(
                 new ApiResponse<>(
                         HttpStatus.BAD_REQUEST.value(),
@@ -72,6 +78,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(InvalidUserPasswordException.class)
     public ResponseEntity<?> handleInvalidUserPassword(InvalidUserPasswordException ex){
+        log.warn("Invalid username or password: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED.value()).body(
                 new ApiResponse<>(
                         HttpStatus.UNAUTHORIZED.value(),
@@ -89,6 +96,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(EventAlreadyExist.class)
     public ResponseEntity<?> handleEventAlreadyExist(EventAlreadyExist ex){
+        log.warn("Event already exist: {}",ex.getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT.value()).body(
                 new ApiResponse<>(
                         HttpStatus.CONFLICT.value(),
@@ -106,11 +114,11 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<?> handleNotValidation(MethodArgumentNotValidException ex){
-
         Map<String,String> errors = new HashMap<>();
         ex.getBindingResult().getFieldErrors().forEach(
                 error -> errors.put(error.getField(),error.getDefaultMessage())
         );
+        log.warn("Request validation failed: {}", errors);
 
         return ResponseEntity.badRequest().body(
                 new ApiResponse<>(
@@ -127,9 +135,9 @@ public class GlobalExceptionHandler {
      * @param ex which is the exception class
      * @return ResponseEntity object
      */
-    @ExceptionHandler()
+    @ExceptionHandler(UserAlreadyExistsException.class)
     public ResponseEntity<?> handleUserAlreadyExisted(UserAlreadyExistsException ex){
-
+        log.warn("User already exist: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT.value()).body(
                 new ApiResponse<>(
                         HttpStatus.CONFLICT.value(),
@@ -146,6 +154,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<?> handleBadCredentials(BadCredentialsException ex) {
+        log.warn("Invalid password: {}", ex.getMessage());
         return ResponseEntity
                 .status(HttpStatus.UNAUTHORIZED).body(
                         new ApiResponse<>(
@@ -153,5 +162,17 @@ public class GlobalExceptionHandler {
                                 "Invalid email or password"
                         )
                 );
+    }
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<?> handleGlobalException(Exception ex) {
+
+        log.error("Unexpected internal server error", ex);
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                new ApiResponse<>(
+                        HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                        "Something went wrong"
+                )
+        );
     }
 }

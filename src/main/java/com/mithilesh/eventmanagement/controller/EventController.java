@@ -10,6 +10,7 @@ import com.mithilesh.eventmanagement.security.UserPrincipal;
 import com.mithilesh.eventmanagement.service.EventService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -21,6 +22,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/event")
 @RequiredArgsConstructor
+@Slf4j
 public class EventController {
 
     private final EventService service;
@@ -33,7 +35,13 @@ public class EventController {
      */
     @PostMapping
     public ResponseEntity<?> createEvent(@Valid @RequestBody EventRegisterRequest event){
+
+        log.info("Event Creation request received");
+
         service.createEvent(event);
+
+        log.info("Event creation request Completed");
+
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 new ApiResponse<>(
                         HttpStatus.CREATED.value(),
@@ -44,9 +52,9 @@ public class EventController {
 
     /**
      * To see list of event
-     *
-     * If user is register it will return event in sorted order (Statename -> favorite -> event name -> popularity)
+     * <p>If user is register it will return event in sorted order (Statename -> favorite -> event name -> popularity)
      * Or events will be returned as Statename -> event name
+     * </p>
      *
      * @param authentication object to check if the user is register or not
      * @return List of events
@@ -56,9 +64,13 @@ public class EventController {
         List<?> result = null;
 
         if(authentication == null || !authentication.isAuthenticated()){
+            log.debug("Fetching all public events");
+
             result = service.getEvents();
         }
         else{
+            log.debug("Fetching events for authenticated user");
+
             UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
             result = service.getEvents(userPrincipal.getUsername());
         }
@@ -85,9 +97,14 @@ public class EventController {
         EventResponse result = null;
 
         if(authentication == null || !authentication.isAuthenticated()){
+
+            log.debug("Fetching event with id: {} for unauthenticated user", id);
+
             result = service.getEventById(id);
         }
         else{
+            log.debug("Fetching event with id: {} for authenticated user", id);
+
             UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
             result = service.getEventById(id,userPrincipal.getUsername());
         }
@@ -112,11 +129,17 @@ public class EventController {
     @PutMapping("/{id}")
     public ResponseEntity<?> updateEvent(@PathVariable long id,@RequestBody EventRegisterRequest request){
 
+        log.info("Event update request received with id: {}",id);
+
+        EventResponse eventResponse = service.updateEvent(id,request);
+
+        log.info("Event update request with id: {} completed successfully",id);
+
         return ResponseEntity.ok().body(
                 new ApiResponse<>(
                         204,
                         "Event is Updated",
-                        service.updateEvent(id,request)
+                        eventResponse
                 )
         );
     }
@@ -129,7 +152,11 @@ public class EventController {
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteEvent(@PathVariable long id){
+
+        log.info("Event Deleted request with id: {} received",id);
         service.deleteEventById(id);
+
+        log.info("Event delete request for id: {} completed Successfully",id);
         return ResponseEntity.noContent().build();
     }
 
@@ -142,11 +169,16 @@ public class EventController {
     @GetMapping("/search")
     public ResponseEntity<?> searchEvent(@ModelAttribute SearchRequest search){
 
+        log.debug("Searching events with provided filters");
+
+        List<?> eventResponses = service.getEventsBySearch(search);
+
+        log.debug("Searching events with provided filters completed");
         return ResponseEntity.ok().body(
                 new ApiResponse<>(
                         200,
                         "Search result",
-                        service.getEventsBySearch(search)
+                        eventResponses
                 )
         );
     }
@@ -161,7 +193,10 @@ public class EventController {
     @PostMapping("/{id}/registrations")
     public ResponseEntity<?> registerEvent(@PathVariable long id, @AuthenticationPrincipal UserPrincipal userPrincipal){
 
+        log.info("Event registration request with id: {} received", id);
         service.registerEvent(id,userPrincipal.getUsername());
+
+        log.info("Event registration request for id: {} completed successfully",id);
         return ResponseEntity.ok(
                 new ApiResponse<>(
                         201,

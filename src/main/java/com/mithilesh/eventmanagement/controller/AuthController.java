@@ -6,6 +6,7 @@ import com.mithilesh.eventmanagement.dto.Request.SignupRequest;
 import com.mithilesh.eventmanagement.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
+@Slf4j
 public class AuthController {
 
     final private AuthService authService;
@@ -29,7 +31,11 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody SignupRequest user){
 
+        log.info("User registration request received");
+
         authService.register(user);
+
+        log.info("User resgistration request completed");
 
         return ResponseEntity.ok(
                 new ApiResponse<>(
@@ -49,6 +55,8 @@ public class AuthController {
      */
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest user){
+
+        log.info("User login request resceived");
         return ResponseEntity.ok(
                 new ApiResponse<>(
                     200,
@@ -60,7 +68,12 @@ public class AuthController {
 
     @PostMapping("/logout")
     public ResponseEntity<?> logout(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorization){
+
+        log.info("User logout request received");
+
         authService.logout(authorization);
+
+        log.info("User logout request completed");
 
         return ResponseEntity.noContent().build();
     }

@@ -10,5 +10,5 @@ import java.time.Instant;
 public interface BlacklistedTokensRepo extends JpaRepository<BlacklistedTokens,Long> {
     boolean existsByToken(String token);
 
-    void deleteByExpireAtBefore(Instant expireAtBefore);
+    int deleteByExpireAtBefore(Instant expireAtBefore);
 }

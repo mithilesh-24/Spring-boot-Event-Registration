@@ -1,5 +1,0 @@
-$kind: http-request
-name: View Favorite
-url: "{{base}}/api/favorite"
-method: GET
-order: 355681987389475

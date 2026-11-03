@@ -14,6 +14,7 @@ import com.mithilesh.eventmanagement.repository.*;
 import com.mithilesh.eventmanagement.specification.EventSpecification;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ import org.springframework.transaction.annotation.Isolation;
 import java.time.LocalDate;
 import java.util.*;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class EventService {
@@ -43,12 +45,15 @@ public class EventService {
      */
     @Transactional
     public void createEvent(EventRegisterRequest request){
+        log.debug("Processing Create event request");
        Events events = new Events();
        LocalDate today = LocalDate.now();
 
         States state = stateRepo.findByStateNameIgnoreCase(request.getStateName()).orElseGet(()-> {
+            log.info("Creating New State with stateName: {}",request.getStateName());
             States newstates = new States();
             newstates.setStateName(request.getStateName());
+            log.info("New State is created with the id: {}",newstates.getStateId());
             return stateRepo.save(newstates);
         });
 
@@ -72,18 +77,20 @@ public class EventService {
         events.setVenue(request.getVenue());
         events.setState(state);
 
+
         eventRepo.save(events);
 
+        log.debug("Created Event Successfully");
     }
 
     /**
      * To get the list of events
-     *
      * if the user is not authenticated this is called
      *
      * @return list of event as Response object
      */
     public List<EventResponse> getEvents() {
+        log.debug("Fetching event for unauthenticated user");
         return eventRepo.findAllByOrderByEventNameAsc()
                 .stream()
                 .map(EventMapper::toResponse)
@@ -92,7 +99,6 @@ public class EventService {
 
     /**
      * to get the list of events
-     *
      * if the user is authentication the list of events in sorted order
      *
      * @param email to get the user favorite events
@@ -100,6 +106,7 @@ public class EventService {
      * @throws UserNotFoundException if the user not exist
      */
     public List<?> getEvents(String email){
+        log.debug("Fetching Events for authenticated user");
         userRepo.findByEmail(email).orElseThrow(() -> new UserNotFoundException("Username not found"));
 
 
@@ -120,6 +127,7 @@ public class EventService {
      * @throws UserNotFoundException if the user email is not found
      */
     public EventResponse getEventById(long id,String email) {
+        log.debug("Fetching event by id: {} for authenticated users",id);
         Events event =  eventRepo.findById(id).orElseThrow(() -> new EventNotFoundException("Event not Found"));
         Users user = userRepo.findByEmail(email).orElseThrow(() ->new UserNotFoundException("Invalid user"));
 
@@ -131,7 +139,8 @@ public class EventService {
 
             eventViewsRepo.save(popularity);
         }
-        
+
+        log.debug("Fetched event with id: {} for authenticated users successfully",id);
         return EventMapper.toResponse(event);
     }
 
@@ -145,7 +154,9 @@ public class EventService {
      */
     @Cacheable("Event")
     public EventResponse getEventById(long id){
+        log.debug("Fetching event by id: {} for unauthenticated users",id);
         Events event =  eventRepo.findById(id).orElseThrow(() -> new EventNotFoundException("Event not Found"));
+        log.debug("Fetched event by id: {} for unauthenicated user successfully",id);
         return EventMapper.toResponse(event);
     }
 
@@ -158,6 +169,7 @@ public class EventService {
      * @throws EventNotFoundException if the event is not found
      */
     public EventResponse updateEvent(long id,EventRegisterRequest request){
+        log.debug("Updating event with id: {}",id);
         Events events = eventRepo.findById(id).orElseThrow(
                 () -> new EventNotFoundException("To update the event, the give id is invalid")
         );
@@ -177,7 +189,7 @@ public class EventService {
         events.setVenue(request.getVenue());
 
         eventRepo.save(events);
-
+        log.debug("Updated event with id: {} successfully",id);
         return EventMapper.toResponse(events);
     }
 
@@ -189,6 +201,7 @@ public class EventService {
      */
     @Transactional
     public void deleteEventById(long id){
+        log.debug("Deleting the event with id: {}",id);
         Events events = eventRepo.findById(id).orElseThrow(
                 ()->new EventNotFoundException("Invalid event to delete")
         );
@@ -198,6 +211,7 @@ public class EventService {
         eventViewsRepo.deleteByEvent(events);
 
         eventRepo.delete(events);
+        log.debug("Deleted event with the id: {}",id);
     }
 
     /**
@@ -208,7 +222,6 @@ public class EventService {
      * @return list of events
      */
     public List<?> getEventsBySearch(SearchRequest searchRequest) {
-
         Specification<Events> spec = (root, query, cb) -> cb.conjunction();
         spec = spec.and(eventSpecification.hasEventName(searchRequest.getEventName()))
                 .and(eventSpecification.hasDescription(searchRequest.getDescription()))
@@ -234,6 +247,7 @@ public class EventService {
      */
     public void registerEvent(long id,String email) {
 
+        log.debug("Registering for a event with id: {}",id);
         if(email == null){
           throw new UserNotFoundException("Email not found");
         }
@@ -247,5 +261,6 @@ public class EventService {
         registration.setUser(user);
 
         registrationRepo.save(registration);
+        log.debug("Registered for a event with id: {} successfully",id);
     }
 }
